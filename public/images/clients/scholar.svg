@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <!-- Scholar Orientation - Anonymous but meaningful: Compass + graduation cap concept -->
+  <defs>
+    <linearGradient id="scholarGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3B82F6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1E40AF;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background circle -->
+  <circle cx="100" cy="100" r="85" fill="url(#scholarGrad)"/>
+
+  <!-- Compass/direction outer ring -->
+  <circle cx="100" cy="100" r="55" fill="none" stroke="white" stroke-width="3" opacity="0.4"/>
+
+  <!-- Directional points (N, E, S, W) -->
+  <circle cx="100" cy="45" r="4" fill="white" opacity="0.8"/>
+  <circle cx="155" cy="100" r="4" fill="white" opacity="0.6"/>
+  <circle cx="100" cy="155" r="4" fill="white" opacity="0.6"/>
+  <circle cx="45" cy="100" r="4" fill="white" opacity="0.6"/>
+
+  <!-- Central graduation cap -->
+  <!-- Cap board -->
+  <path d="M70 85L100 75L130 85L130 90L70 90Z" fill="white" opacity="0.95"/>
+
+  <!-- Cap base -->
+  <ellipse cx="100" cy="95" rx="25" ry="8" fill="white" opacity="0.95"/>
+
+  <!-- Tassel -->
+  <line x1="130" y1="85" x2="138" y2="95" stroke="white" stroke-width="2" opacity="0.9"/>
+  <circle cx="138" cy="97" r="3" fill="white" opacity="0.9"/>
+
+  <!-- Upward growth arrows (representing career path) -->
+  <path d="M100 115L90 125M100 115L110 125" stroke="white" stroke-width="3"
+        stroke-linecap="round" opacity="0.7"/>
+  <path d="M100 130L90 140M100 130L110 140" stroke="white" stroke-width="3"
+        stroke-linecap="round" opacity="0.5"/>
+
+  <!-- Success path line -->
+  <path d="M55 140Q75 115 100 110T145 130" fill="none" stroke="white"
+        stroke-width="2.5" stroke-dasharray="4,3" opacity="0.6"/>
+</svg>

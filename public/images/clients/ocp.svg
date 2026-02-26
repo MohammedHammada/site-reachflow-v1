@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <!-- White background -->
+  <rect width="200" height="200" fill="white"/>
+
+  <!-- OCP Green -->
+  <g fill="#00A651">
+    <!-- Laurel wreath - left side -->
+    <ellipse cx="60" cy="70" rx="4" ry="10" transform="rotate(-30 60 70)" opacity="0.7"/>
+    <ellipse cx="52" cy="90" rx="4" ry="12" transform="rotate(-20 52 90)" opacity="0.7"/>
+    <ellipse cx="48" cy="110" rx="4" ry="12" transform="rotate(-10 48 110)" opacity="0.7"/>
+    <ellipse cx="50" cy="130" rx="4" ry="10" transform="rotate(10 50 130)" opacity="0.7"/>
+
+    <!-- Laurel wreath - right side -->
+    <ellipse cx="140" cy="70" rx="4" ry="10" transform="rotate(30 140 70)" opacity="0.7"/>
+    <ellipse cx="148" cy="90" rx="4" ry="12" transform="rotate(20 148 90)" opacity="0.7"/>
+    <ellipse cx="152" cy="110" rx="4" ry="12" transform="rotate(10 152 110)" opacity="0.7"/>
+    <ellipse cx="150" cy="130" rx="4" ry="10" transform="rotate(-10 150 130)" opacity="0.7"/>
+
+    <!-- Six-pointed star (phosphate crystal) -->
+    <path d="M100 50L108 78L138 78L114 95L122 123L100 106L78 123L86 95L62 78L92 78Z"/>
+
+    <!-- "OCP" text -->
+    <text x="100" y="170" font-family="Arial, Helvetica, sans-serif" font-weight="900"
+          font-size="36" text-anchor="middle" letter-spacing="4">OCP</text>
+  </g>
+</svg>

@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 120" fill="none">
+  <!-- White background -->
+  <rect width="200" height="120" fill="white"/>
+
+  <!-- INWI purple color #A6368C -->
+  <g fill="#A6368C">
+    <!-- "i" - first letter -->
+    <rect x="15" y="45" width="18" height="50" rx="9"/>
+    <circle cx="24" cy="32" r="9"/>
+
+    <!-- "n" -->
+    <path d="M45 95V55c0-8 6-12 15-12 9 0 15 4 15 12v40H63V58c0-3-2-5-5-5s-5 2-5 5v37H45z"/>
+
+    <!-- "w" -->
+    <path d="M85 45h12l5 28 5-28h12v50h-10V60l-6 35h-8l-6-35v35H85V45z"/>
+
+    <!-- "i" - last letter -->
+    <rect x="135" y="45" width="18" height="50" rx="9"/>
+    <circle cx="144" cy="32" r="9"/>
+
+    <!-- "TM" trademark -->
+    <text x="165" y="50" font-family="Arial" font-weight="bold" font-size="10">TM</text>
+  </g>
+</svg>
