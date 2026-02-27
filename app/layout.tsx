@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Space_Grotesk, Inter } from "next/font/google";
+import { GoogleTagManager } from "@next/third-parties/google";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -81,6 +82,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr" className={`${spaceGrotesk.variable} ${inter.variable}`}>
+      <GoogleTagManager gtmId="GTM-MJSZV79S" />
       <head>
         <script
           type="application/ld+json"
@@ -130,6 +132,14 @@ export default function RootLayout({
         />
       </head>
       <body suppressHydrationWarning className="antialiased font-[family-name:var(--font-body)]">
+        <noscript>
+          <iframe
+            src="https://www.googletagmanager.com/ns.html?id=GTM-MJSZV79S"
+            height="0"
+            width="0"
+            style={{ display: "none", visibility: "hidden" }}
+          />
+        </noscript>
         {/* Skip navigation for accessibility */}
         <a
           href="#main-content"
