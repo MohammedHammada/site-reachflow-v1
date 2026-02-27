@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: "/",
       disallow: ["/api/"],
     },
-    sitemap: "https://reachflow.ma/sitemap.xml",
+    sitemap: "https://www.reachflow.ma/sitemap.xml",
   };
 }

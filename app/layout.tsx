@@ -23,7 +23,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://reachflow.ma"),
+  metadataBase: new URL("https://www.reachflow.ma"),
   alternates: {
     canonical: "/",
   },
@@ -45,13 +45,13 @@ export const metadata: Metadata = {
     title: "Reachflow | Agence de Croissance Digitale au Maroc",
     description:
       "Agence de croissance digitale Full-Cycle. Media Buying, Production de Contenu, D\u00e9veloppement Web.",
-    url: "https://reachflow.ma",
+    url: "https://www.reachflow.ma",
     siteName: "Reachflow",
     locale: "fr_MA",
     type: "website",
     images: [
       {
-        url: "https://reachflow.ma/og-image.png",
+        url: "https://www.reachflow.ma/og-image.png",
         width: 1200,
         height: 630,
         alt: "Reachflow - Agence de Croissance Digitale au Maroc",
@@ -63,7 +63,7 @@ export const metadata: Metadata = {
     title: "Reachflow | Agence de Croissance Digitale",
     description:
       "Agence de croissance digitale Full-Cycle au Maroc.",
-    images: ["https://reachflow.ma/og-image.png"],
+    images: ["https://www.reachflow.ma/og-image.png"],
   },
   robots: {
     index: true,
@@ -89,8 +89,8 @@ export default function RootLayout({
               "@context": "https://schema.org",
               "@type": "Organization",
               name: "Reachflow",
-              url: "https://reachflow.ma",
-              logo: "https://reachflow.ma/og-image.png",
+              url: "https://www.reachflow.ma",
+              logo: "https://www.reachflow.ma/og-image.png",
               description: "Agence de croissance digitale Full-Cycle au Maroc. Media Buying, Production de Contenu, Développement Web.",
               email: "contact@reachflow.ma",
               telephone: "+212663291741",
