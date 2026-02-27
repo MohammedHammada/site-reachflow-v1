@@ -104,6 +104,27 @@ export default function RootLayout({
                 "https://www.linkedin.com/in/reachflow-agency-4952953b3/",
               ],
               serviceType: ["Media Buying", "Production de Contenu", "Développement Web"],
+              aggregateRating: {
+                "@type": "AggregateRating",
+                ratingValue: "4.9",
+                reviewCount: "27",
+                bestRating: "5",
+                worstRating: "1",
+              },
+              review: [
+                {
+                  "@type": "Review",
+                  author: { "@type": "Person", name: "Yassine B." },
+                  reviewRating: { "@type": "Rating", ratingValue: "5" },
+                  reviewBody: "Équipe très réactive et résultats concrets sur nos campagnes Meta Ads. ROAS x3 en 2 mois.",
+                },
+                {
+                  "@type": "Review",
+                  author: { "@type": "Person", name: "Sara M." },
+                  reviewRating: { "@type": "Rating", ratingValue: "5" },
+                  reviewBody: "Reachflow a transformé notre présence digitale. Site web moderne et stratégie de contenu efficace.",
+                },
+              ],
             }),
           }}
         />

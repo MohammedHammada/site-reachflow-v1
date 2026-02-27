@@ -232,3 +232,19 @@ body {
 
 /* ==================== DIVIDER ==================== */
 .section-divider { height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06) 50%, transparent); }
+
+/* ==================== PRINT ==================== */
+@media print {
+  body { background: #fff !important; color: #000 !important; cursor: auto !important; }
+  nav, .grain-overlay, .grid-bg, .orb, footer,
+  .whatsapp-btn, .custom-cursor, .floating-orbs { display: none !important; }
+  * { color: #000 !important; background: transparent !important;
+      box-shadow: none !important; text-shadow: none !important;
+      -webkit-text-fill-color: #000 !important; }
+  a { text-decoration: underline; }
+  a[href]::after { content: " (" attr(href) ")"; font-size: 0.8em; }
+  .text-gradient { background: none !important; -webkit-text-fill-color: #000 !important; }
+  .btn-primary, .btn-outline { border: 1px solid #000 !important; padding: 8px 16px !important; }
+  section { page-break-inside: avoid; }
+  @page { margin: 2cm; }
+}

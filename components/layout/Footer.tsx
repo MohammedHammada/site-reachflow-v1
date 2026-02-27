@@ -165,6 +165,38 @@ export default function Footer() {
           </div>
         </div>
 
+        {/* Newsletter */}
+        <div
+          className="flex flex-col sm:flex-row items-center justify-between gap-6"
+          style={{ paddingTop: 40, paddingBottom: 40 }}
+        >
+          <div>
+            <h3 className="font-[family-name:var(--font-display)] font-semibold text-white text-base" style={{ marginBottom: 4 }}>
+              Restez inform&eacute;
+            </h3>
+            <p className="text-sm text-text-secondary">
+              Conseils growth, tendances digitales &mdash; directement dans votre boîte.
+            </p>
+          </div>
+          <form
+            action="#"
+            className="flex w-full sm:w-auto"
+          >
+            <input
+              type="email"
+              placeholder="votre@email.com"
+              required
+              className="h-11 px-4 text-sm bg-bg-primary border border-border-subtle rounded-l-lg text-white placeholder:text-text-muted/50 focus:outline-none focus:border-accent-primary w-full sm:w-64 transition-colors duration-200"
+            />
+            <button
+              type="submit"
+              className="h-11 px-5 text-sm font-medium bg-accent-primary hover:bg-orange-600 text-white rounded-r-lg transition-colors duration-200 whitespace-nowrap"
+            >
+              S&apos;inscrire
+            </button>
+          </form>
+        </div>
+
         {/* Divider */}
         <div className="border-t border-border-subtle" />
 

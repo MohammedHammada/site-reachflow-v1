@@ -135,50 +135,97 @@ export default function HeroSection() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 1.5 }}
           className="grid grid-cols-3"
-          style={{ maxWidth: 780, width: "100%", marginTop: 56, marginBottom: 72, gap: "clamp(16px, 2.5vw, 24px)" }}
+          style={{ maxWidth: 820, width: "100%", marginTop: 56, marginBottom: 72, gap: "clamp(14px, 2vw, 20px)" }}
         >
           {[
-            { ...heroStats[0], icon: Rocket },
-            { ...heroStats[1], icon: BarChart3 },
-            { ...heroStats[2], icon: TrendingUp },
-          ].map((stat) => {
+            { ...heroStats[0], icon: Rocket, color: "#f97316" },
+            { ...heroStats[1], icon: BarChart3, color: "#f97316" },
+            { ...heroStats[2], icon: TrendingUp, color: "#f97316" },
+          ].map((stat, index) => {
             const Icon = stat.icon;
             return (
               <motion.div
                 key={stat.label}
-                whileHover={{ y: -4, borderColor: "rgba(249, 115, 22, 0.2)" }}
-                transition={{ duration: 0.35, ease: [0.23, 1, 0.32, 1] }}
-                className="relative group text-center cursor-pointer flex flex-col items-center"
+                initial={{ opacity: 0, y: 24 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 1.6 + index * 0.1 }}
+                whileHover={{ y: -6, scale: 1.02 }}
+                className="stat-card relative group text-center cursor-pointer flex flex-col items-center overflow-hidden"
                 style={{
-                  padding: "32px 24px 28px",
-                  borderRadius: 20,
-                  background: "rgba(255, 255, 255, 0.025)",
-                  backdropFilter: "blur(20px)",
-                  WebkitBackdropFilter: "blur(20px)",
-                  border: "1px solid rgba(255, 255, 255, 0.06)",
+                  padding: "36px 24px 32px",
+                  borderRadius: 24,
+                  background: "linear-gradient(160deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.015) 100%)",
+                  backdropFilter: "blur(24px)",
+                  WebkitBackdropFilter: "blur(24px)",
+                  border: "1px solid rgba(255, 255, 255, 0.08)",
+                  boxShadow: "0 4px 24px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.08)",
                 }}
               >
-                {/* Icon */}
-                <div style={{ marginBottom: 16 }}>
-                  <Icon
-                    size={20}
-                    className="text-orange-500/60 group-hover:text-orange-400 transition-colors duration-300"
-                    strokeWidth={1.8}
-                  />
+                {/* Top accent line */}
+                <div
+                  className="absolute top-0 left-1/2 -translate-x-1/2 h-[2px] rounded-full transition-all duration-500"
+                  style={{
+                    width: "40%",
+                    background: `linear-gradient(90deg, transparent, ${stat.color}, transparent)`,
+                    opacity: 0.6,
+                  }}
+                />
+
+                {/* Background glow on hover */}
+                <div
+                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"
+                  style={{
+                    background: `radial-gradient(circle at 50% 0%, ${stat.color}15, transparent 70%)`,
+                  }}
+                />
+
+                {/* Icon — orange filled circle like service cards */}
+                <div className="relative" style={{ marginBottom: 20 }}>
+                  <div
+                    className="relative z-10 flex items-center justify-center group-hover:scale-110 transition-transform duration-500"
+                    style={{ width: 56, height: 56 }}
+                  >
+                    {/* Glow */}
+                    <div
+                      className="absolute inset-0 rounded-full opacity-40 group-hover:opacity-100 transition-opacity duration-500"
+                      style={{
+                        background: stat.color,
+                        filter: "blur(16px)",
+                      }}
+                    />
+                    {/* Circle */}
+                    <div
+                      className="relative w-full h-full rounded-full flex items-center justify-center shadow-2xl"
+                      style={{
+                        background: `linear-gradient(135deg, ${stat.color}, ${stat.color}cc)`,
+                        boxShadow: `0 8px 32px ${stat.color}50`,
+                      }}
+                    >
+                      <Icon size={24} className="text-white" strokeWidth={2} />
+                    </div>
+                  </div>
                 </div>
 
                 {/* Number */}
                 <span
                   className="font-[family-name:var(--font-display)] font-bold text-white block leading-none"
-                  style={{ fontSize: "clamp(2rem, 4.5vw, 2.75rem)", marginBottom: 10 }}
+                  style={{ fontSize: "clamp(2.25rem, 5vw, 3rem)", marginBottom: 12 }}
                 >
                   <CounterAnimation target={stat.value} suffix={stat.suffix} />
                 </span>
 
                 {/* Label */}
-                <span className="text-[0.75rem] text-text-muted/60 font-medium uppercase tracking-[0.08em] leading-snug">
+                <span className="text-[0.75rem] text-text-muted/70 font-medium uppercase tracking-[0.1em] leading-snug">
                   {stat.label}
                 </span>
+
+                {/* Hover border overlay */}
+                <div
+                  className="absolute inset-0 rounded-[24px] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                  style={{
+                    border: `1px solid ${stat.color}30`,
+                  }}
+                />
               </motion.div>
             );
           })}
