@@ -130,6 +130,11 @@ export default function RootLayout({
             }),
           }}
         />
+        <script
+          type="text/javascript"
+          src="//widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js"
+          async
+        />
       </head>
       <body suppressHydrationWarning className="antialiased font-[family-name:var(--font-body)]">
         <noscript>

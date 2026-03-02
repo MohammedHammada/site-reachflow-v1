@@ -200,6 +200,25 @@ export default function Footer() {
         {/* Divider */}
         <div className="border-t border-border-subtle" />
 
+        {/* Trustpilot */}
+        <div style={{ paddingTop: 24, paddingBottom: 24 }}>
+          <div
+            className="trustpilot-widget"
+            data-locale="fr-FR"
+            data-template-id="56278e9abfbbba0bdcd568bc"
+            data-businessunit-id="69a373a20ea9ad1c3a972a94"
+            data-style-height="52px"
+            data-style-width="100%"
+          >
+            <a href="https://fr.trustpilot.com/review/reachflow.ma" target="_blank" rel="noopener noreferrer">
+              Trustpilot
+            </a>
+          </div>
+        </div>
+
+        {/* Divider */}
+        <div className="border-t border-border-subtle" />
+
         {/* Bottom bar */}
         <div
           className="flex flex-col md:flex-row items-center justify-between gap-4"
