@@ -230,6 +230,12 @@ body {
   animation: hero-shimmer 4s linear infinite;
 }
 
+/* ==================== TRUSTPILOT ==================== */
+.trustpilot-widget iframe { color-scheme: dark; }
+.trustpilot-widget a,
+.trustpilot-widget span,
+.trustpilot-widget div { color: #fff !important; }
+
 /* ==================== DIVIDER ==================== */
 .section-divider { height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06) 50%, transparent); }
 

@@ -157,7 +157,8 @@ export default function RootLayout({
         <Analytics />
         <Script
           src="https://widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
+          id="trustpilot-bootstrap"
         />
       </body>
     </html>

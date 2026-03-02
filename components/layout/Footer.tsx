@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { siteConfig, navLinks, services } from "@/lib/constants";
 import { Instagram, Facebook, Linkedin } from "lucide-react";
+import TrustpilotWidget from "@/components/layout/TrustpilotWidget";
 
 export default function Footer() {
   return (
@@ -200,22 +201,8 @@ export default function Footer() {
         {/* Divider */}
         <div className="border-t border-border-subtle" />
 
-        {/* Trustpilot */}
-        <div style={{ paddingTop: 24, paddingBottom: 24 }} className="flex justify-center">
-          <div
-            className="trustpilot-widget"
-            data-locale="fr-FR"
-            data-template-id="56278e9abfbbba0bdcd568bc"
-            data-businessunit-id="69a373a20ea9ad1c3a972a94"
-            data-style-height="52px"
-            data-style-width="100%"
-            data-theme="dark"
-          >
-            <a href="https://fr.trustpilot.com/review/reachflow.ma" target="_blank" rel="noopener noreferrer">
-              Trustpilot
-            </a>
-          </div>
-        </div>
+        {/* Trustpilot Review Collector */}
+        <TrustpilotWidget />
 
         {/* Divider */}
         <div className="border-t border-border-subtle" />
