@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Space_Grotesk, Inter } from "next/font/google";
 import { GoogleTagManager } from "@next/third-parties/google";
+import Script from "next/script";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -130,11 +131,6 @@ export default function RootLayout({
             }),
           }}
         />
-        <script
-          type="text/javascript"
-          src="//widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js"
-          async
-        />
       </head>
       <body suppressHydrationWarning className="antialiased font-[family-name:var(--font-body)]">
         <noscript>
@@ -159,6 +155,10 @@ export default function RootLayout({
         <Footer />
         <WhatsAppButton />
         <Analytics />
+        <Script
+          src="https://widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js"
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   );
