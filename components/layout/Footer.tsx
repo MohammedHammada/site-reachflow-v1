@@ -168,34 +168,115 @@ export default function Footer() {
 
         {/* Newsletter */}
         <div
-          className="flex flex-col sm:flex-row items-center justify-between gap-6"
-          style={{ paddingTop: 40, paddingBottom: 40 }}
+          style={{
+            paddingTop: 48,
+            paddingBottom: 48,
+          }}
         >
-          <div>
-            <h3 className="font-[family-name:var(--font-display)] font-semibold text-white text-base" style={{ marginBottom: 4 }}>
-              Restez inform&eacute;
-            </h3>
-            <p className="text-sm text-text-secondary">
-              Conseils growth, tendances digitales &mdash; directement dans votre boîte.
-            </p>
-          </div>
-          <form
-            action="#"
-            className="flex w-full sm:w-auto"
+          <div
+            style={{
+              background: "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
+              border: "1px solid rgba(255,255,255,0.08)",
+              borderRadius: 20,
+              padding: "40px 36px",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              textAlign: "center",
+              gap: 8,
+            }}
           >
-            <input
-              type="email"
-              placeholder="votre@email.com"
-              required
-              className="h-11 px-4 text-sm bg-bg-primary border border-border-subtle rounded-l-lg text-white placeholder:text-text-muted/50 focus:outline-none focus:border-accent-primary w-full sm:w-64 transition-colors duration-200"
-            />
-            <button
-              type="submit"
-              className="h-11 px-5 text-sm font-medium bg-accent-primary hover:bg-orange-600 text-white rounded-r-lg transition-colors duration-200 whitespace-nowrap"
+            {/* Tag */}
+            <span
+              style={{
+                fontSize: "0.6875rem",
+                fontWeight: 600,
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+                color: "#f97316",
+                marginBottom: 4,
+              }}
             >
-              S&apos;inscrire
-            </button>
-          </form>
+              Newsletter
+            </span>
+
+            {/* Title */}
+            <h3
+              className="font-[family-name:var(--font-display)]"
+              style={{
+                fontSize: "1.375rem",
+                fontWeight: 700,
+                color: "#FAFAFA",
+                letterSpacing: "-0.02em",
+                margin: 0,
+              }}
+            >
+              Restez dans la boucle
+            </h3>
+
+            {/* Description */}
+            <p
+              style={{
+                fontSize: "0.875rem",
+                color: "rgba(255,255,255,0.5)",
+                maxWidth: 380,
+                lineHeight: 1.6,
+                margin: 0,
+                marginBottom: 16,
+              }}
+            >
+              Conseils growth, tendances digitales et insights &mdash; directement dans votre boîte.
+            </p>
+
+            {/* Form */}
+            <form
+              action="#"
+              style={{
+                display: "flex",
+                width: "100%",
+                maxWidth: 420,
+                borderRadius: 12,
+                overflow: "hidden",
+                border: "1px solid rgba(255,255,255,0.1)",
+                background: "rgba(9, 9, 11, 0.6)",
+              }}
+            >
+              <input
+                type="email"
+                placeholder="votre@email.com"
+                required
+                style={{
+                  flex: 1,
+                  height: 48,
+                  padding: "0 18px",
+                  fontSize: "0.875rem",
+                  background: "transparent",
+                  border: "none",
+                  outline: "none",
+                  color: "#FAFAFA",
+                  minWidth: 0,
+                }}
+              />
+              <button
+                type="submit"
+                className="hover:bg-orange-700"
+                style={{
+                  height: 48,
+                  padding: "0 24px",
+                  fontSize: "0.8125rem",
+                  fontWeight: 600,
+                  background: "#f97316",
+                  color: "#fff",
+                  border: "none",
+                  cursor: "pointer",
+                  whiteSpace: "nowrap",
+                  transition: "background 0.2s ease",
+                }}
+              >
+                S&apos;inscrire
+              </button>
+            </form>
+          </div>
         </div>
 
         {/* Divider */}
