@@ -1,525 +1,705 @@
 "use client";
 
-import { useState, useRef, useEffect, type FormEvent } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 
-// ─── LIGHT THEME PALETTE (same system as /agences-etudes) ──────────────────
-const C = {
-  bg: "#FFFFFF",
-  bgAlt: "#F5F4F1",
-  ink: "#0A0A0A",
-  inkSoft: "#5A5A5A",
-  inkFaint: "#8A8A8A",
-  orange: "#FF6B00",
-  orangeSoft: "#FFF1E8",
-  line: "rgba(10,10,10,0.10)",
-  lineStrong: "rgba(10,10,10,0.18)",
-};
+// Faithful port of the approved aménagement/rénovation LP design (the dark
+// "Apple design" version iterated on directly with the client) into this
+// site's real Next.js app, wired to the real backend:
+//  - form POSTs to /api/submit-lead (same endpoint /agences-etudes uses)
+//    and to NEXT_PUBLIC_CRM_WEBHOOK_URL, then routes to /thank-you-amenagement
+//  - logo + roadmap teaser now reference real files in /public instead of
+//    Claude-artifact-only /_blob/ URLs
+//  - testimonial stars reverted to plain ★ per earlier agreed decision
+//    (no fabricated Trustpilot-style platform styling)
+//  - theme hardcoded to dark only (this is a standalone page, not a
+//    theme-aware Claude artifact, and dark is what was reviewed throughout)
 
-// ─── LOGOS (shared trust strip, reused across all niche LPs on this site) ──
-const logos = [
-  { src: "/logos/1.png", alt: "Client 1" },
-  { src: "/logos/2.png", alt: "Client 2" },
-  { src: "/logos/3.png", alt: "Client 3" },
-  { src: "/logos/4.png", alt: "Client 4" },
-  { src: "/logos/5.png", alt: "Client 5" },
-  { src: "/logos/6.png", alt: "Client 6" },
-  { src: "/logos/7.png", alt: "Client 7" },
-  { src: "/logos/8.png", alt: "Client 8" },
-  { src: "/logos/9.png", alt: "Client 9" },
-  { src: "/logos/10.png", alt: "Client 10" },
-  { src: "/logos/11.png", alt: "Client 11" },
-];
-const doubled = [...logos, ...logos];
+const PAGE_STYLES = `
+  :root{
+    --bg:#000000; --bg-elevated:#1C1C1E; --surface:#151517;
+    --text:#F5F5F7; --text-muted:#98989D;
+    --accent:#FF6B29; --accent-2:#FF3D68; --accent-ink:#D6551D;
+    --gradient-brand:linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+    --border:rgba(255,255,255,0.10); --hairline:rgba(255,255,255,0.14);
+    --check:#1E8E5A;
+    --shadow-s:0 1px 2px rgba(0,0,0,0.5); --shadow-m:0 8px 24px rgba(0,0,0,0.45); --shadow-l:0 24px 60px rgba(0,0,0,0.55);
+    --radius-s:10px; --radius-m:18px; --radius-l:28px; --radius-pill:980px;
+    --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Inter", "Helvetica Neue", Arial, sans-serif;
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  #rf-lp{
+    background:var(--bg); color:var(--text); font-family:var(--font);
+    line-height:1.5; -webkit-font-smoothing:antialiased; font-size:17px;
+    position:relative; overflow-x:clip;
+  }
+  #rf-lp *{box-sizing:border-box;}
+  #rf-lp .bg-glow{ position:fixed; z-index:0; border-radius:50%; filter:blur(90px); pointer-events:none; }
+  #rf-lp .bg-glow-1{ top:-180px; right:-160px; width:460px; height:460px; background:radial-gradient(circle, color-mix(in srgb, var(--accent) 30%, transparent) 0%, transparent 70%); }
+  #rf-lp .bg-glow-2{ top:420px; left:-200px; width:420px; height:420px; background:radial-gradient(circle, color-mix(in srgb, var(--accent-2) 20%, transparent) 0%, transparent 70%); }
+  #rf-lp .gradient-text{ background:var(--gradient-brand); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  #rf-lp .hl{ color:var(--accent); font-weight:700; text-decoration:underline; text-decoration-color:color-mix(in srgb, var(--accent) 55%, transparent); text-decoration-thickness:2px; text-underline-offset:3px; }
+  #rf-lp .hl-soft{ color:var(--accent-ink); font-weight:700; }
+  #rf-lp .hl-light{ color:#fff; font-weight:700; text-decoration:underline; text-decoration-color:rgba(255,255,255,0.55); text-decoration-thickness:2px; text-underline-offset:3px; }
+  #rf-lp img{max-width:100%; display:block;}
+  #rf-lp .wrap{max-width:1100px; margin:0 auto; padding:0 24px; min-width:0; position:relative; z-index:1;}
+  #rf-lp .hero-content > *, #rf-lp .approach-grid > *, #rf-lp .form-wrap > *, #rf-lp .how-grid > *,
+  #rf-lp .test-grid > *, #rf-lp .quote-grid > *, #rf-lp .check-grid > *{ min-width:0; }
+  #rf-lp h1,#rf-lp h2,#rf-lp h3{font-weight:700; color:var(--text);}
+  #rf-lp h1{font-size:clamp(2.4rem, 5.4vw, 4.4rem); line-height:1.04; letter-spacing:-0.025em;}
+  #rf-lp h2{font-size:clamp(1.7rem, 3.4vw, 2.6rem); line-height:1.08; letter-spacing:-0.02em;}
+  #rf-lp h3{font-size:1.2rem; font-weight:600; letter-spacing:-0.005em;}
+  #rf-lp p{color:var(--text-muted); font-size:1.02rem; line-height:1.6;}
+  #rf-lp a{color:inherit;}
+  #rf-lp section{padding:110px 0; position:relative; z-index:1;}
+  @media (max-width:720px){ #rf-lp section{padding:64px 0;} #rf-lp h1{letter-spacing:-0.015em;} }
+  #rf-lp [data-reveal]{ opacity:0; transform:translateY(16px); transition:opacity 700ms var(--ease), transform 700ms var(--ease); }
+  #rf-lp [data-reveal].is-visible{ opacity:1; transform:translateY(0); }
+  @media (prefers-reduced-motion: reduce){ #rf-lp [data-reveal]{ opacity:1; transform:none; transition:none; } }
 
-// ─── QUALIFIER FORM — 5 questions d'éligibilité + 3 champs de contact ──────
+  #rf-lp .site-header{
+    position:sticky; top:0; z-index:50;
+    padding:14px 24px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;
+    background:color-mix(in srgb, var(--bg) 72%, transparent);
+    backdrop-filter:blur(20px) saturate(180%); -webkit-backdrop-filter:blur(20px) saturate(180%);
+    border-bottom:1px solid transparent; transition:border-color 300ms var(--ease);
+  }
+  #rf-lp .site-header.is-scrolled{ border-bottom-color:var(--hairline); }
+  #rf-lp .brand-logo img{ display:block; height:24px; width:auto; }
+  #rf-lp .header-right{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; justify-content:flex-end; }
+  #rf-lp .brand-tag{ font-size:0.76rem; color:var(--text-muted); border:1px solid var(--border); padding:5px 12px; border-radius:var(--radius-pill); font-weight:500; white-space:nowrap; }
+  #rf-lp .header-cta{
+    font-size:0.86rem; font-weight:600; padding:9px 18px; border-radius:var(--radius-pill);
+    background:var(--gradient-brand); color:#fff; text-decoration:none; white-space:nowrap;
+    opacity:0; transform:translateY(-6px); pointer-events:none; max-width:0; overflow:hidden; padding-left:0; padding-right:0;
+    transition:opacity 260ms var(--ease), transform 260ms var(--ease), max-width 260ms var(--ease), padding 260ms var(--ease);
+  }
+  #rf-lp .site-header.is-scrolled .header-cta{ opacity:1; transform:translateY(0); pointer-events:auto; max-width:220px; padding-left:18px; padding-right:18px; }
+  @media (max-width:520px){ #rf-lp .brand-tag,#rf-lp .header-cta{ display:none; } #rf-lp .site-header{ justify-content:center; } }
 
-const qualifySteps = [
-  {
-    id: "icp",
-    headline: "Votre activité, c'est bien l'aménagement intérieur et/ou la rénovation ?",
-    options: [
-      { label: "Oui, activité principale", eligible: true },
-      { label: "En partie / je démarre", eligible: true },
-      { label: "Non, autre activité", eligible: true },
-    ],
-  },
-  {
-    id: "satisfaction",
-    headline: "Êtes-vous satisfait du nombre de chantiers actuels ?",
-    options: [
-      { label: "Oui, je suis satisfait", eligible: false },
-      { label: "Non, je veux plus", eligible: true },
-    ],
-  },
-  {
-    id: "blocage",
-    headline: "Votre principal blocage aujourd'hui ?",
-    options: [
-      { label: "Pas assez de demandes qualifiées", eligible: true },
-      { label: "Les devis traînent, pas assez de closing", eligible: true },
-      { label: "Pas le temps de prospecter", eligible: true },
-      { label: "Je dépends du bouche-à-oreille", eligible: true },
-    ],
-  },
-  {
-    id: "budget",
-    headline: "Quel budget mensuel total (pub + accompagnement) pouvez-vous allouer ?",
-    options: [
-      { label: "Moins de 3 000 DH", eligible: false },
-      { label: "3 000 – 6 000 DH", eligible: true },
-      { label: "Plus de 6 000 DH", eligible: true },
-      { label: "Je ne sais pas encore", eligible: true },
-    ],
-  },
-  {
-    id: "urgence",
-    headline: "Quand voulez-vous commencer à recevoir des chantiers ?",
-    options: [
-      { label: "Dès que possible / ce mois-ci", eligible: true },
-      { label: "Dans 1 – 2 mois", eligible: true },
-      { label: "Je me renseigne juste, aucun projet", eligible: false },
-    ],
-  },
-];
+  #rf-lp .btn{
+    position:relative; overflow:hidden; display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    background:var(--gradient-brand); color:#fff; font-weight:700; font-size:1.02rem; letter-spacing:-0.005em;
+    padding:16px 30px; border-radius:var(--radius-pill); border:none; cursor:pointer; text-decoration:none;
+    transition:transform 120ms var(--ease), box-shadow 200ms var(--ease);
+    box-shadow:0 10px 26px color-mix(in srgb, var(--accent) 38%, transparent);
+  }
+  #rf-lp .btn:hover{ box-shadow:0 14px 34px color-mix(in srgb, var(--accent) 48%, transparent); }
+  #rf-lp .btn:active{ transform:scale(0.96); transition-duration:90ms; }
+  #rf-lp .btn-block{width:100%;}
+  @media (max-width:480px){ #rf-lp .btn{ width:100%; } }
+  #rf-lp .micro-risk{ font-size:0.86rem; color:var(--text-muted); margin-top:14px; display:flex; gap:8px; align-items:flex-start; }
+  #rf-lp .micro-risk svg{flex-shrink:0; margin-top:2px; color:var(--check);}
 
-const contactFields = [
-  { key: "nom" as const,   headline: "Quel est votre nom complet ?",              label: "Nom complet",           type: "text", placeholder: "Votre nom complet" },
-  { key: "phone" as const, headline: "Votre numéro WhatsApp ?",                   label: "Téléphone / WhatsApp",  type: "tel",  placeholder: "06 00 00 00 00" },
-  { key: "ville" as const, headline: "Quelle est la ville de votre entreprise ?", label: "Ville de l'entreprise", type: "text", placeholder: "Ex : Casablanca, Rabat…" },
-];
+  #rf-lp .trustbar{ display:flex; align-items:center; justify-content:center; gap:10px 16px; flex-wrap:wrap; padding:6px 0 32px 0; }
+  #rf-lp .trust-avatars{ display:flex; align-items:center; }
+  #rf-lp .trust-avatars .avatar{ width:30px; height:30px; font-size:0.62rem; margin-left:-9px; border:2px solid var(--bg); box-shadow:0 0 0 1px var(--border); }
+  #rf-lp .trust-avatars .avatar:first-child{ margin-left:0; }
+  #rf-lp .avatar-more{ background:var(--surface); color:var(--text-muted); font-weight:700; }
+  #rf-lp .trust-count{font-size:0.92rem; font-weight:500; color:var(--text-muted);}
+  #rf-lp .rating{ display:flex; align-items:center; gap:6px; font-size:0.88rem; font-weight:600; }
+  #rf-lp .rating .stars{color:var(--accent); letter-spacing:1px;}
 
-const TOTAL_STEPS = qualifySteps.length + contactFields.length; // 8
+  #rf-lp .hero{padding-top:56px; padding-bottom:60px; text-align:center;}
+  #rf-lp .hero-content{ max-width:680px; margin:0 auto; }
+  #rf-lp .hero-roadmap{ max-width:560px; margin:32px auto 32px; }
+  @media (max-width:720px){ #rf-lp .hero-roadmap{ margin:26px auto 26px; } }
+  #rf-lp .hero h1{margin-bottom:22px;}
+  #rf-lp .hero .lede{font-size:1.14rem; max-width:46ch; margin:0 auto 30px; color:var(--text-muted);}
 
-function QualifierFormLight({ sectionRef }: { sectionRef: React.RefObject<HTMLElement | null> }) {
-  const [currentStep, setCurrentStep] = useState(0);
-  const [answers, setAnswers] = useState<Record<number, string>>({});
-  const [formData, setFormData] = useState({ nom: "", phone: "", ville: "" });
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  #rf-lp .roadmap-card{
+    position:relative; background:var(--bg-elevated); border:2px solid color-mix(in srgb, var(--accent) 65%, var(--border));
+    border-radius:var(--radius-l); overflow:hidden;
+    box-shadow:var(--shadow-m), 0 0 0 1px color-mix(in srgb, var(--accent) 20%, transparent), 0 20px 60px color-mix(in srgb, var(--accent) 25%, transparent);
+  }
+  #rf-lp .roadmap-img{ display:block; width:100%; height:auto; }
+  #rf-lp .roadmap-lock-pill{
+    position:absolute; left:50%; bottom:8%; transform:translateX(-50%);
+    display:inline-flex; align-items:center; gap:8px; white-space:nowrap; cursor:pointer;
+    background:#14161B; color:#fff; font-weight:700; font-size:0.82rem; letter-spacing:0.03em; text-transform:uppercase;
+    padding:12px 22px; border-radius:var(--radius-pill); border:1px solid rgba(255,255,255,0.18);
+    text-decoration:none; box-shadow:0 10px 26px rgba(0,0,0,0.35);
+    transition:transform 150ms var(--ease), box-shadow 150ms var(--ease);
+  }
+  #rf-lp .roadmap-lock-pill:hover{ transform:translateX(-50%) translateY(-2px); box-shadow:0 14px 32px rgba(0,0,0,0.45); }
+  #rf-lp .roadmap-lock-pill svg{ color:var(--accent); flex-shrink:0; }
+  #rf-lp .roadmap-caption{font-size:0.8rem; color:var(--text-muted); text-align:center; margin-top:16px;}
+
+  #rf-lp .eyebrow-num{ font-weight:600; color:var(--accent); font-size:0.9rem; margin-bottom:12px; display:block; letter-spacing:0.01em; }
+  #rf-lp .section-head{max-width:640px; margin-bottom:52px;}
+  #rf-lp .section-head p{margin-top:14px; font-size:1.05rem;}
+  #rf-lp .center{text-align:center; margin-left:auto; margin-right:auto;}
+  #rf-lp .steps-title{text-align:center; max-width:800px; margin:0 auto;}
+  #rf-lp .steps-title p{margin-top:16px;}
+
+  #rf-lp .how-grid{display:grid; grid-template-columns:repeat(3, 1fr); gap:24px; margin-bottom:44px;}
+  @media (max-width:820px){ #rf-lp .how-grid{grid-template-columns:1fr;} }
+  #rf-lp .how-card{ background:var(--bg-elevated); border:1px solid var(--border); border-radius:var(--radius-m); padding:28px; box-shadow:var(--shadow-s); transition:box-shadow 250ms var(--ease), transform 250ms var(--ease); }
+  #rf-lp .how-card:hover{ box-shadow:0 16px 36px color-mix(in srgb, var(--accent) 20%, transparent); transform:translateY(-4px); }
+  #rf-lp .how-icon{ width:52px; height:52px; border-radius:16px; background:var(--gradient-brand); display:flex; align-items:center; justify-content:center; color:#fff; box-shadow:0 8px 20px color-mix(in srgb, var(--accent) 35%, transparent); }
+  #rf-lp .how-num{font-size:0.8rem; font-weight:700; color:var(--accent); letter-spacing:0.06em; margin-top:16px; display:block;}
+  #rf-lp .how-card h3{margin:6px 0 8px 0;}
+  #rf-lp .how-card p{font-size:0.96rem;}
+  #rf-lp .cta-center{text-align:center; margin-top:8px;}
+  #rf-lp .cta-center .micro-risk{justify-content:center;}
+
+  #rf-lp .growth-path{ position:relative; background:var(--bg-elevated); border:1px solid var(--border); border-radius:var(--radius-l); padding:56px 48px; box-shadow:var(--shadow-m); overflow:hidden; }
+  #rf-lp .growth-path::after{ content:""; position:absolute; top:-40%; right:-10%; width:60%; aspect-ratio:1; background:radial-gradient(circle, color-mix(in srgb, var(--accent) 16%, transparent) 0%, transparent 70%); pointer-events:none; }
+  #rf-lp .growth-steps{ position:relative; display:flex; gap:0; z-index:1; }
+  #rf-lp .growth-line, #rf-lp .growth-line-fill{ position:absolute; top:26px; left:26px; right:26px; height:3px; border-radius:3px; }
+  #rf-lp .growth-line{ background:var(--border); }
+  #rf-lp .growth-line-fill{ background:linear-gradient(90deg, var(--accent), var(--accent-ink)); width:0%; transition:width 1400ms var(--ease) 250ms; }
+  #rf-lp .growth-path.is-visible .growth-line-fill{ width:100%; }
+  #rf-lp .growth-step{ flex:1; display:flex; flex-direction:column; align-items:center; text-align:center; position:relative; z-index:1; padding:0 14px; }
+  #rf-lp .growth-badge{ width:52px; height:52px; border-radius:50%; background:var(--bg-elevated); border:2px solid var(--border); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:1rem; color:var(--text-muted); margin-bottom:18px; transition:transform 400ms var(--ease), box-shadow 400ms var(--ease); }
+  #rf-lp .growth-step:nth-child(4) .growth-badge{ background:color-mix(in srgb, var(--accent) 14%, var(--bg-elevated)); border-color:color-mix(in srgb, var(--accent) 30%, var(--border)); color:var(--accent-ink); }
+  #rf-lp .growth-step:nth-child(5) .growth-badge{ background:color-mix(in srgb, var(--accent) 30%, var(--bg-elevated)); border-color:color-mix(in srgb, var(--accent) 55%, var(--border)); color:var(--accent-ink); }
+  #rf-lp .growth-step:last-child .growth-badge{ background:var(--gradient-brand); color:#fff; border-color:transparent; box-shadow:0 10px 28px color-mix(in srgb, var(--accent) 45%, transparent); font-size:1.3rem; }
+  #rf-lp .growth-path.is-visible .growth-step:last-child .growth-badge{ transform:scale(1.08); }
+  #rf-lp .growth-step strong{ font-size:1.14rem; letter-spacing:-0.015em; white-space:nowrap; }
+  #rf-lp .growth-step span{ font-size:0.86rem; color:var(--text-muted); margin-top:8px; display:block; max-width:21ch; }
+  @media (max-width:720px){
+    #rf-lp .growth-path{ padding:38px 26px; }
+    #rf-lp .growth-steps{ flex-direction:column; gap:34px; }
+    #rf-lp .growth-line, #rf-lp .growth-line-fill{ top:26px; bottom:26px; left:26px; right:auto; width:3px; height:auto; }
+    #rf-lp .growth-line-fill{ width:3px; height:0%; transition:height 1400ms var(--ease) 250ms; }
+    #rf-lp .growth-path.is-visible .growth-line-fill{ height:100%; width:3px; }
+    #rf-lp .growth-step{ flex-direction:row; align-items:flex-start; text-align:left; padding:0; gap:18px; min-width:0; }
+    #rf-lp .growth-badge{ margin-bottom:0; flex-shrink:0; }
+    #rf-lp .growth-copy{ min-width:0; }
+    #rf-lp .growth-step strong{ font-size:clamp(1.05rem, 5.8vw, 1.3rem); display:block; }
+    #rf-lp .growth-step span{ max-width:none; white-space:normal; }
+  }
+
+  #rf-lp .approach-grid{display:grid; grid-template-columns:1fr 1fr; gap:64px; align-items:center;}
+  @media (max-width:820px){ #rf-lp .approach-grid{grid-template-columns:1fr; gap:32px;} }
+  #rf-lp .objective-card{ padding:28px; }
+  #rf-lp .objective-grid{ display:grid; grid-template-columns:1fr 1fr; gap:22px; }
+  #rf-lp .objective-item{ display:flex; flex-direction:column; gap:12px; }
+  #rf-lp .objective-item span:last-child{ font-weight:600; font-size:0.94rem; color:var(--text); }
+  @media (max-width:480px){ #rf-lp .objective-grid{ gap:18px; } }
+  #rf-lp .check-list{list-style:none; display:flex; flex-direction:column; gap:16px; margin:24px 0;}
+  #rf-lp .check-list li{display:flex; gap:14px; align-items:center; font-size:1.04rem; color:var(--text);}
+  #rf-lp .check-icon{ flex-shrink:0; width:28px; height:28px; border-radius:50%; background:color-mix(in srgb, var(--check) 16%, var(--bg-elevated)); color:var(--check); display:flex; align-items:center; justify-content:center; }
+  #rf-lp .niche-icon{ width:34px; height:34px; border-radius:10px; flex-shrink:0; background:var(--gradient-brand); color:#fff; display:flex; align-items:center; justify-content:center; }
+
+  #rf-lp .form-section{background:var(--surface);}
+  #rf-lp .form-wrap{display:grid; grid-template-columns:0.9fr 1.1fr; gap:56px; align-items:flex-start;}
+  @media (max-width:880px){ #rf-lp .form-wrap{grid-template-columns:1fr; gap:32px;} }
+  #rf-lp .form-card{background:var(--bg-elevated); border:1px solid var(--border); border-radius:var(--radius-l); padding:36px; box-shadow:var(--shadow-m);}
+  @media (max-width:480px){ #rf-lp .form-card{padding:24px 20px;} }
+  #rf-lp .field{margin-bottom:20px;}
+  #rf-lp .field label{display:block; font-size:0.86rem; font-weight:600; margin-bottom:8px;}
+  #rf-lp .field .hint{display:block; font-weight:400; color:var(--text-muted); font-size:0.8rem; margin-top:6px;}
+  #rf-lp .field input[type=text], #rf-lp .field input[type=tel], #rf-lp .field input[type=email]{
+    width:100%; padding:13px 15px; border-radius:var(--radius-s); border:1px solid var(--border);
+    background:var(--bg); color:var(--text); font-family:var(--font); font-size:0.98rem;
+    transition:border-color 160ms var(--ease), box-shadow 160ms var(--ease);
+  }
+  #rf-lp .field input:focus{ outline:none; border-color:var(--accent); box-shadow:0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent); }
+  #rf-lp .check-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  @media (max-width:480px){ #rf-lp .check-grid{grid-template-columns:1fr;} }
+  #rf-lp .check-opt{ border:1px solid var(--border); border-radius:var(--radius-s); padding:12px 13px; font-size:0.88rem; display:flex; gap:9px; align-items:center; cursor:pointer; user-select:none; background:var(--bg); transition:border-color 160ms var(--ease), background 160ms var(--ease); }
+  #rf-lp .check-opt input{accent-color:var(--accent);}
+  #rf-lp .check-opt.active{border-color:var(--accent); background:color-mix(in srgb, var(--accent) 8%, var(--bg));}
+  #rf-lp .form-note{font-size:0.86rem; margin-top:18px;}
+
+  #rf-lp .proof-banner{ position:relative; background:var(--gradient-brand); border-radius:var(--radius-l); padding:56px 32px; text-align:center; box-shadow:0 20px 50px color-mix(in srgb, var(--accent) 35%, transparent); overflow:hidden; }
+  #rf-lp .proof-banner::before{ content:""; position:absolute; inset:0; background:radial-gradient(circle at 20% 20%, rgba(255,255,255,0.25) 0%, transparent 45%); pointer-events:none; }
+  #rf-lp .proof-number{font-weight:700; font-size:clamp(2.4rem,5.4vw,3.6rem); color:#fff; letter-spacing:-0.02em; position:relative;}
+  #rf-lp .proof-banner p{margin-top:10px; font-size:1.02rem; color:rgba(255,255,255,0.9); position:relative;}
+
+  #rf-lp .test-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:20px; margin-bottom:20px;}
+  @media (max-width:720px){ #rf-lp .test-grid{grid-template-columns:1fr;} }
+  #rf-lp .test-audio{ background:var(--bg-elevated); border:1px solid var(--border); border-radius:var(--radius-m); padding:24px; display:flex; flex-direction:column; gap:12px; box-shadow:var(--shadow-s); }
+  #rf-lp .test-audio-top{display:flex; align-items:center; gap:12px;}
+  #rf-lp .avatar{width:44px; height:44px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-weight:700; color:#fff; font-size:0.85rem;}
+  #rf-lp .avatar-1{ background:linear-gradient(135deg, #FF6B29, #FF3D68); }
+  #rf-lp .avatar-2{ background:linear-gradient(135deg, #FFB020, #FF6B29); }
+  #rf-lp .avatar-3{ background:linear-gradient(135deg, #FF3D68, #B84E9E); }
+  #rf-lp .avatar-4{ background:linear-gradient(135deg, #FF8A3D, #FF3D68); }
+  #rf-lp .avatar-5{ background:linear-gradient(135deg, #FFB020, #FF3D68); }
+  #rf-lp .test-audio strong{font-size:0.94rem;}
+  #rf-lp .test-audio .badge{font-size:0.74rem; color:var(--check); display:block; margin-top:2px;}
+  #rf-lp .waveform{height:34px; border-radius:var(--radius-pill); background:var(--surface); position:relative; overflow:hidden;}
+  #rf-lp .waveform::after{ content:""; position:absolute; inset:0; background:repeating-linear-gradient(90deg, var(--accent) 0 3px, transparent 3px 6px); opacity:0.3; }
+  #rf-lp .quote-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:20px;}
+  @media (max-width:820px){ #rf-lp .quote-grid{grid-template-columns:1fr;} }
+  #rf-lp .quote-card{ background:var(--bg-elevated); border:1px solid var(--border); border-radius:var(--radius-m); padding:24px; box-shadow:var(--shadow-s); transition:box-shadow 250ms var(--ease), transform 250ms var(--ease); }
+  #rf-lp .quote-card:hover{ box-shadow:var(--shadow-m); transform:translateY(-2px); }
+  #rf-lp .quote-card .stars{color:var(--accent); font-size:0.86rem; margin-bottom:12px; display:block;}
+  #rf-lp .quote-card p{font-size:0.92rem; color:var(--text); margin-bottom:16px;}
+  #rf-lp .quote-who{display:flex; align-items:center; gap:10px;}
+  #rf-lp .quote-who strong{font-size:0.86rem;}
+  #rf-lp .quote-who span{font-size:0.76rem; color:var(--text-muted); display:block;}
+
+  #rf-lp .final-cta{ position:relative; text-align:center; padding:72px 32px; border-radius:var(--radius-l); overflow:hidden; }
+  #rf-lp .final-cta::before{ content:""; position:absolute; inset:0; background:radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--accent) 14%, transparent) 0%, transparent 60%); pointer-events:none; }
+  #rf-lp .final-cta h2{max-width:680px; margin:0 auto 18px auto; position:relative;}
+  #rf-lp .final-cta .btn, #rf-lp .final-cta .micro-risk{ position:relative; }
+
+  #rf-lp .site-footer{border-top:1px solid var(--border); padding:40px 0; text-align:center;}
+  #rf-lp .site-footer p{font-size:0.84rem;}
+  #rf-lp .site-footer .brand-logo{justify-content:center; display:flex; margin-bottom:10px;}
+
+  #rf-lp .sticky-cta{
+    position:fixed; left:0; right:0; bottom:0; z-index:60;
+    background:color-mix(in srgb, var(--bg-elevated) 94%, transparent);
+    backdrop-filter:blur(20px) saturate(180%); -webkit-backdrop-filter:blur(20px) saturate(180%);
+    border-top:1px solid var(--hairline); box-shadow:0 -10px 28px rgba(0,0,0,0.35);
+    padding:10px 18px; transform:translateY(100%); opacity:0; pointer-events:none;
+    transition:transform 280ms var(--ease), opacity 280ms var(--ease); display:none;
+  }
+  #rf-lp .sticky-cta.is-visible{ transform:translateY(0); opacity:1; pointer-events:auto; }
+  #rf-lp .sticky-cta-label{ display:block; text-align:center; font-size:0.68rem; color:var(--text-muted); margin-bottom:6px; }
+  #rf-lp .sticky-cta .btn{ width:100%; padding:12px 20px; font-size:0.88rem; box-shadow:0 6px 18px color-mix(in srgb, var(--accent) 30%, transparent); }
+  @media (max-width:640px){ #rf-lp .sticky-cta{ display:block; } }
+
+  @media (max-width:640px){
+    #rf-lp .site-header{ padding:10px 20px; }
+    #rf-lp .hero{ padding-top:0; padding-bottom:24px; }
+    #rf-lp .trustbar{ padding:6px 0 8px; gap:5px 10px; }
+    #rf-lp .trust-avatars .avatar{ width:22px; height:22px; font-size:0.52rem; margin-left:-7px; }
+    #rf-lp .trust-count{ font-size:0.68rem; }
+    #rf-lp .rating{ font-size:0.68rem; }
+    #rf-lp .hero h1{ font-size:clamp(1.5rem, 7vw, 1.85rem); line-height:1.22; margin-bottom:8px; letter-spacing:-0.005em; }
+    #rf-lp .hero .lede{ font-size:0.86rem; line-height:1.5; margin-bottom:14px; }
+    #rf-lp .hero .btn{ padding:12px 20px; font-size:0.88rem; }
+    #rf-lp .hero .micro-risk{ font-size:0.66rem; margin-top:8px; gap:5px; }
+    #rf-lp h2{ font-size:clamp(1.35rem, 6.4vw, 1.65rem); line-height:1.18; letter-spacing:-0.01em; }
+    #rf-lp .section-head{ margin-bottom:32px; }
+    #rf-lp .btn{ padding:12px 20px; font-size:0.88rem; }
+  }
+`;
+
+const HERO_ROADMAP_SVG = `
+  <a href="#form" class="roadmap-lock-pill">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+    ROADMAP COMPLÈTE
+  </a>
+`;
+
+const PAGE_HTML = `
+<div class="bg-glow bg-glow-1" aria-hidden="true"></div>
+<div class="bg-glow bg-glow-2" aria-hidden="true"></div>
+
+<header id="rfHeader" class="site-header">
+  <span class="brand-logo"><img src="/reachflow-logo-light-text.png" alt="ReachFlow" style="height:24px;width:auto;"></span>
+  <div class="header-right">
+    <div class="brand-tag">Aménagement &amp; Rénovation</div>
+    <a href="#form" class="header-cta">Diagnostic gratuit</a>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <div class="trustbar">
+      <div class="trust-avatars">
+        <span class="avatar avatar-1">EC</span>
+        <span class="avatar avatar-2">SR</span>
+        <span class="avatar avatar-3">NM</span>
+        <span class="avatar avatar-4">HB</span>
+        <span class="avatar avatar-5">YT</span>
+        <span class="avatar avatar-more">+20</span>
+      </div>
+      <div class="trust-count"><span class="hl-soft">+20 entreprises</span> d'aménagement et de rénovation nous font confiance au Maroc</div>
+      <div class="rating"><span class="stars">★★★★★</span> 4.9 · 14 avis</div>
+    </div>
+
+    <div class="hero-content">
+      <div>
+        <h1>Votre entreprise d'aménagement et de rénovation a un potentiel de chantiers <span class="gradient-text">bien supérieur</span> à ce que vous exploitez aujourd'hui.</h1>
+        <p class="lede"><span class="hl">Bouche-à-oreille</span>, devis qui traînent — découvrez <span class="hl">gratuitement</span> à quelle étape de croissance vous êtes bloqué, et le <span class="hl">plan exact</span> pour la débloquer.</p>
+
+        <a href="#form" class="btn">Découvrez si votre entreprise est éligible</a>
+        <div class="micro-risk">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>
+          <span><span class="hl-soft">Aucun paiement</span> ne vous sera demandé sans accord mutuel préalable.</span>
+        </div>
+
+        <div class="hero-roadmap">
+          <div class="roadmap-card" data-reveal>
+            <img class="roadmap-img" src="/roadmap-amenagement-preview.png" alt="Aperçu flouté de la roadmap de croissance en 6 étapes">
+            ${HERO_ROADMAP_SVG}
+          </div>
+          <p class="roadmap-caption">La roadmap détaillée vous est dévoilée pendant votre <span class="hl-soft">diagnostic gratuit</span>.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="steps-title" data-reveal>
+      <h2><span class="gradient-text">Les 6 étapes essentielles</span> du scaling, identifiées dans toutes les entreprises d'aménagement et de rénovation que nous avons accompagnées.</h2>
+      <p>Et les raisons précises pour lesquelles votre entreprise est probablement bloquée à l'une de ces étapes — <span class="hl">dépendance au réseau</span>, <span class="hl">devis qui traînent</span>, ou <span class="hl">chantiers qui plafonnent</span> votre capacité.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="section-head center" data-reveal>
+      <span class="eyebrow-num">Comment ça marche</span>
+      <h2>Un process en <span class="gradient-text">3 temps</span>, sans engagement de votre part.</h2>
+    </div>
+    <div class="how-grid">
+      <div class="how-card" data-reveal>
+        <div class="how-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></div>
+        <div class="how-num">ÉTAPE 01</div>
+        <h3>Diagnostic gratuit</h3>
+        <p>Nous réalisons une analyse experte de votre entreprise pour déterminer votre <span class="hl">position exacte</span> sur notre roadmap en 6 étapes.</p>
+      </div>
+      <div class="how-card" data-reveal>
+        <div class="how-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="0.5" fill="currentColor"/></svg></div>
+        <div class="how-num">ÉTAPE 02</div>
+        <h3>Détection du blocage</h3>
+        <p>Nous identifions précisément ce qui freine votre croissance : <span class="hl">acquisition de chantiers qualifiés</span>, <span class="hl">closing des devis</span>, organisation d'équipe, ou capacité de production.</p>
+      </div>
+      <div class="how-card" data-reveal>
+        <div class="how-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 20l-6-2V4l6 2 6-2 6 2v14l-6-2-6 2z"/><path d="M9 6v14M15 4v14"/></svg></div>
+        <div class="how-num">ÉTAPE 03</div>
+        <h3>Stratégie personnalisée</h3>
+        <p>Vous obtenez un <span class="hl">plan détaillé et sur-mesure</span>, adapté à votre réalité de terrain et à votre région — <span class="hl">sans engagement</span> de votre part.</p>
+      </div>
+    </div>
+    <div class="cta-center">
+      <a href="#form" class="btn">Découvrez si votre entreprise est éligible</a>
+      <div class="micro-risk">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>
+        <span><span class="hl-soft">Aucun paiement</span> ne vous sera demandé sans accord mutuel préalable.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="section-head center" data-reveal>
+      <h2>Plus de 20 entreprises d'aménagement et de rénovation au Maroc ont déjà <span class="gradient-text">augmenté leur chiffre d'affaires mensuel</span> grâce à notre accompagnement.</h2>
+      <p>Voici la progression type que traverse une entreprise accompagnée par ReachFlow, palier par palier :</p>
+    </div>
+    <div class="growth-path" data-reveal>
+      <div class="growth-steps">
+        <div class="growth-line"></div>
+        <div class="growth-line-fill"></div>
+        <div class="growth-step">
+          <div class="growth-badge">01</div>
+          <div class="growth-copy"><strong>Point de départ</strong><span>Chantiers irréguliers, dépendants du bouche-à-oreille</span></div>
+        </div>
+        <div class="growth-step">
+          <div class="growth-badge">02</div>
+          <div class="growth-copy"><strong>500 000 MAD</strong><span>/ mois — Flux de chantiers stable toute l'année</span></div>
+        </div>
+        <div class="growth-step">
+          <div class="growth-badge">03</div>
+          <div class="growth-copy"><strong>1 500 000 MAD</strong><span>/ mois — Votre équipe commerciale prend le relais</span></div>
+        </div>
+        <div class="growth-step">
+          <div class="growth-badge">🚀</div>
+          <div class="growth-copy"><strong>3 000 000+ MAD</strong><span>/ mois — Expansion à plusieurs villes</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap approach-grid">
+    <div data-reveal>
+      <h2>Notre approche est <span class="gradient-text">100&nbsp;% sur mesure</span>.</h2>
+      <p style="margin-bottom:16px;">Nous ne sommes pas une agence de leads comme les autres : on construit avec vous une croissance durable, <span class="hl">de l'acquisition jusqu'à la structuration de votre équipe</span>.</p>
+      <p>Que votre objectif soit de :</p>
+      <ul class="check-list">
+        <li><span class="check-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg></span><span>Remplir votre carnet de chantiers toute l'année, <span class="hl">sans creux</span></span></li>
+        <li><span class="check-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg></span><span>Augmenter la <span class="hl">valeur moyenne</span> de vos projets</span></li>
+        <li><span class="check-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg></span><span>Vous étendre dans <span class="hl">d'autres villes</span></span></li>
+        <li><span class="check-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg></span><span>Structurer <span class="hl">votre propre équipe commerciale</span></span></li>
+      </ul>
+      <p>… nous construisons le plan avec vous, à partir de votre étape actuelle.</p>
+    </div>
+    <div class="roadmap-card objective-card" data-reveal>
+      <div class="objective-grid">
+        <div class="objective-item"><span class="niche-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6M9 11h.01M15 11h.01M9 15h.01M15 15h.01"/></svg></span><span>Chantiers toute l'année</span></div>
+        <div class="objective-item"><span class="niche-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M15 9.5c0-1.4-1.3-2.5-3-2.5s-3 1.1-3 2.5 1.3 2.2 3 2.5c1.7.3 3 1.1 3 2.5s-1.3 2.5-3 2.5-3-1.1-3-2.5"/></svg></span><span>Valeur des projets</span></div>
+        <div class="objective-item"><span class="niche-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.4-7-11.5A7 7 0 0 1 19 9.5C19 14.6 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.3"/></svg></span><span>Nouvelles villes</span></div>
+        <div class="objective-item"><span class="niche-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 20c0-3.5 2.9-6 6.5-6s6.5 2.5 6.5 6"/><circle cx="17.5" cy="8.5" r="2.4"/><path d="M15.8 14.2c2.7.4 4.7 2.4 4.7 5.3"/></svg></span><span>Votre équipe commerciale</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="form-section" id="form">
+  <div class="wrap">
+    <div class="form-wrap">
+      <div data-reveal>
+        <span class="eyebrow-num">Votre dossier</span>
+        <h2>Voyons si votre entreprise est <span class="gradient-text">éligible</span> à un diagnostic gratuit.</h2>
+        <p style="margin-top:16px;">Quelques informations pour préparer une analyse pertinente de votre situation — <span class="hl">pas de démarchage, pas d'engagement</span>.</p>
+      </div>
+
+      <div class="form-card" data-reveal>
+        <form id="leadForm">
+          <div class="field">
+            <label for="fullname">Nom complet *</label>
+            <input type="text" id="fullname" required>
+          </div>
+          <div class="field">
+            <label for="phone">Téléphone *
+              <span class="hint"><span class="hl">Requis :</span> ce numéro doit être lié à un <span class="hl">compte WhatsApp actif</span> pour que notre expert puisse valider votre dossier.</span>
+            </label>
+            <input type="tel" id="phone" required>
+          </div>
+          <div class="field">
+            <label for="email">Email *</label>
+            <input type="email" id="email" required>
+          </div>
+          <div class="field">
+            <label for="company">Nom de l'entreprise *</label>
+            <input type="text" id="company" required>
+          </div>
+          <div class="field">
+            <label for="insta">Page Instagram ou site web *</label>
+            <input type="text" id="insta" required>
+          </div>
+          <div class="field">
+            <label>Quel type de projets réalisez-vous principalement ? *</label>
+            <div class="check-grid">
+              <label class="check-opt"><input type="checkbox" name="type" value="renovation"> Rénovation complète de logement</label>
+              <label class="check-opt"><input type="checkbox" name="type" value="amenagement"> Aménagement intérieur clé-en-main</label>
+              <label class="check-opt"><input type="checkbox" name="type" value="cuisine-sdb"> Cuisine &amp; salle de bain</label>
+              <label class="check-opt"><input type="checkbox" name="type" value="tertiaire"> Bureaux &amp; locaux commerciaux</label>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-block" id="leadSubmitBtn">Voir si mon entreprise est éligible</button>
+          <p class="form-note"><span class="hl-soft">Aucun paiement</span> ne vous sera demandé sans accord mutuel préalable.</p>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="proof-banner" data-reveal>
+      <div class="proof-number">+120 millions de dirhams</div>
+      <p>de projets accompagnés pour nos partenaires en <span class="hl-light">moins de 2 ans</span>.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="section-head center" data-reveal>
+      <h2>Écoutez ce que <span class="gradient-text">nos partenaires</span> disent</h2>
+    </div>
+
+    <div class="test-grid">
+      <div class="test-audio" data-reveal>
+        <div class="test-audio-top">
+          <div class="avatar avatar-1">EC</div>
+          <div><strong>Entreprise d'aménagement — Casablanca</strong><span class="badge">✓ Audio</span></div>
+        </div>
+        <div class="waveform"></div>
+      </div>
+      <div class="test-audio" data-reveal>
+        <div class="test-audio-top">
+          <div class="avatar avatar-2">SR</div>
+          <div><strong>Société de rénovation — Rabat</strong><span class="badge">✓ Audio</span></div>
+        </div>
+        <div class="waveform"></div>
+      </div>
+    </div>
+
+    <div class="quote-grid">
+      <div class="quote-card" data-reveal>
+        <span class="stars">★★★★★</span>
+        <p>« Depuis qu'on travaille avec ReachFlow, on <span class="hl">ne dépend plus uniquement du bouche-à-oreille</span>. On a enfin une <span class="hl">vraie stratégie de croissance</span>, pas juste des contacts au compte-gouttes. »</p>
+        <div class="quote-who"><div class="avatar avatar-3" style="width:32px;height:32px;font-size:0.7rem;">NM</div><div><strong>Nom du client</strong><span>Entreprise d'aménagement intérieur, Marrakech</span></div></div>
+      </div>
+      <div class="quote-card" data-reveal>
+        <span class="stars">★★★★★</span>
+        <p>« L'équipe est réactive et <span class="hl">comprend vraiment les contraintes du secteur</span>. Ce n'est pas juste des demandes, c'est un <span class="hl">vrai accompagnement</span>. »</p>
+        <div class="quote-who"><div class="avatar avatar-4" style="width:32px;height:32px;font-size:0.7rem;">HB</div><div><strong>Nom du client</strong><span>Société d'aménagement, Casablanca</span></div></div>
+      </div>
+      <div class="quote-card" data-reveal>
+        <span class="stars">★★★★★</span>
+        <p>« On a enfin une <span class="hl">visibilité claire sur notre pipeline</span> de chantiers au lieu de subir les creux d'activité. »</p>
+        <div class="quote-who"><div class="avatar avatar-5" style="width:32px;height:32px;font-size:0.7rem;">YT</div><div><strong>Nom du client</strong><span>Société de rénovation, Tanger</span></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap final-cta" data-reveal>
+    <h2>Prêt à savoir où se situe votre entreprise sur <span class="gradient-text">la roadmap</span> ?</h2>
+    <a href="#form" class="btn">Découvrez si votre entreprise est éligible</a>
+    <div class="micro-risk" style="justify-content:center; margin-top:14px;">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>
+      <span><span class="hl-soft">Aucun paiement</span> ne vous sera demandé sans accord mutuel préalable.</span>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span class="brand-logo"><img src="/reachflow-logo-light-text.png" alt="ReachFlow" style="height:20px;width:auto;margin:0 auto 10px;"></span>
+    <p>Le partenaire de croissance pour les entreprises d'aménagement et de rénovation ambitieuses.</p>
+    <p style="margin-top:6px;">© 2026 ReachFlow. Tous droits réservés.</p>
+  </div>
+</footer>
+
+<div class="sticky-cta" id="stickyCta">
+  <span class="sticky-cta-label">Diagnostic gratuit · Sans engagement</span>
+  <a href="#form" class="btn btn-block">Voir si mon entreprise est éligible</a>
+</div>
+`;
+
+export default function AmenagementPage() {
+  const rootRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
-  const progress = ((currentStep + 1) / TOTAL_STEPS) * 100;
-  const isChoiceStep = currentStep < qualifySteps.length;
-  const contactIndex = currentStep - qualifySteps.length;
-  const isLastStep = currentStep === TOTAL_STEPS - 1;
-  const selected = answers[currentStep] ?? null;
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
 
-  const computeDisqualified = () =>
-    qualifySteps.some((step, i) => {
-      const opt = step.options.find((o) => o.label === answers[i]);
-      return opt ? !opt.eligible : false;
+    const header = root.querySelector<HTMLElement>("#rfHeader");
+    const onScroll = () => header?.classList.toggle("is-scrolled", window.scrollY > 40);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+
+    root.querySelectorAll<HTMLLabelElement>(".check-opt").forEach((opt) => {
+      const input = opt.querySelector("input");
+      input?.addEventListener("change", () => opt.classList.toggle("active", input.checked));
     });
 
-  const handleSelectOption = (opt: { label: string }) => {
-    setAnswers((prev) => ({ ...prev, [currentStep]: opt.label }));
-  };
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const revealTargets = root.querySelectorAll<HTMLElement>("[data-reveal]");
+    let io: IntersectionObserver | null = null;
+    if (!reduceMotion && "IntersectionObserver" in window) {
+      io = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("is-visible");
+              io?.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.15, rootMargin: "0px 0px -60px 0px" }
+      );
+      revealTargets.forEach((el) => io!.observe(el));
+    } else {
+      revealTargets.forEach((el) => el.classList.add("is-visible"));
+    }
 
-  const handleNext = () => {
-    if (isChoiceStep && !answers[currentStep]) return;
-    setCurrentStep((s) => s + 1);
-  };
+    const heroBtn = root.querySelector<HTMLElement>(".hero .btn");
+    const formSection = root.querySelector<HTMLElement>("#form");
+    const stickyCta = root.querySelector<HTMLElement>("#stickyCta");
+    let heroPast = false;
+    let formInView = false;
+    let stickyIo1: IntersectionObserver | null = null;
+    let stickyIo2: IntersectionObserver | null = null;
+    if (heroBtn && formSection && stickyCta && "IntersectionObserver" in window) {
+      const update = () => stickyCta.classList.toggle("is-visible", heroPast && !formInView);
+      stickyIo1 = new IntersectionObserver(
+        (entries) => { heroPast = !entries[0].isIntersecting; update(); },
+        { rootMargin: "0px 0px -85% 0px" }
+      );
+      stickyIo1.observe(heroBtn);
+      stickyIo2 = new IntersectionObserver(
+        (entries) => { formInView = entries[0].isIntersecting; update(); },
+        { threshold: 0.1 }
+      );
+      stickyIo2.observe(formSection);
+    }
 
-  const handleBack = () => {
-    if (currentStep === 0) return;
-    setCurrentStep((s) => s - 1);
-  };
+    const form = root.querySelector<HTMLFormElement>("#leadForm");
+    const submitBtn = root.querySelector<HTMLButtonElement>("#leadSubmitBtn");
+    const onSubmit = async (e: Event) => {
+      e.preventDefault();
+      if (!form) return;
+      const checks = form.querySelectorAll<HTMLInputElement>('input[name="type"]:checked');
+      if (checks.length === 0) {
+        alert("Merci de sélectionner au moins un type de projet.");
+        return;
+      }
+      if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = "Envoi…"; }
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    const isDisqualified = computeDisqualified();
-    const payload = {
-      nomComplet: formData.nom,
-      telephone: formData.phone,
-      villeEntreprise: formData.ville,
-      icp: answers[0] || "",
-      satisfaction: answers[1] || "",
-      blocage: answers[2] || "",
-      budget: answers[3] || "",
-      urgence: answers[4] || "",
-      eligible: !isDisqualified,
-      source: "amenagement",
-      datetime: (() => {
+      const fullname = (form.querySelector<HTMLInputElement>("#fullname")?.value || "").trim();
+      const phone = (form.querySelector<HTMLInputElement>("#phone")?.value || "").trim();
+      const email = (form.querySelector<HTMLInputElement>("#email")?.value || "").trim();
+      const company = (form.querySelector<HTMLInputElement>("#company")?.value || "").trim();
+      const insta = (form.querySelector<HTMLInputElement>("#insta")?.value || "").trim();
+      const projectTypes = Array.from(checks).map((c) => c.value);
+      const datetime = (() => {
         const n = new Date();
         const p = (x: number) => String(x).padStart(2, "0");
         return `${p(n.getDate())}/${p(n.getMonth() + 1)}/${n.getFullYear()} ${p(n.getHours())}:${p(n.getMinutes())}:${p(n.getSeconds())}`;
-      })(),
-    };
-    try {
-      await fetch("/api/submit-lead", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...payload, isDisqualified }),
-      });
-    } catch (err) {
-      console.error(err);
-    }
-    try {
-      const url = process.env.NEXT_PUBLIC_CRM_WEBHOOK_URL;
-      const secret = process.env.NEXT_PUBLIC_CRM_WEBHOOK_SECRET;
-      if (url) {
-        await fetch(url, {
+      })();
+
+      const sheetPayload = {
+        nomComplet: fullname,
+        telephone: phone,
+        email,
+        entreprise: company,
+        instagramOuSite: insta,
+        typesDeProjets: projectTypes.join(", "),
+        eligible: true,
+        source: "amenagement",
+        datetime,
+      };
+
+      try {
+        await fetch("/api/submit-lead", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            ...(secret ? { Authorization: `Bearer ${secret}` } : {}),
-          },
-          body: JSON.stringify({
-            name: formData.nom,
-            phone: formData.phone,
-            company: formData.ville,
-            source: "amenagement",
-            has_booked_call: false,
-            notes: Object.entries(payload).map(([k, v]) => `${k}: ${v}`).join(" | "),
-          }),
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ...sheetPayload, isDisqualified: false }),
         });
+      } catch (err) {
+        console.error(err);
       }
-    } catch (err) {
-      console.error(err);
-    }
-    const params = new URLSearchParams({ nom: formData.nom, phone: formData.phone });
-    router.push(isDisqualified ? "/non-eligible" : `/thank-you-amenagement?${params.toString()}`);
-  };
+      try {
+        const url = process.env.NEXT_PUBLIC_CRM_WEBHOOK_URL;
+        const secret = process.env.NEXT_PUBLIC_CRM_WEBHOOK_SECRET;
+        if (url) {
+          await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", ...(secret ? { Authorization: `Bearer ${secret}` } : {}) },
+            body: JSON.stringify({
+              name: fullname,
+              phone,
+              company,
+              source: "amenagement",
+              has_booked_call: false,
+              notes: Object.entries(sheetPayload).map(([k, v]) => `${k}: ${v}`).join(" | "),
+            }),
+          });
+        }
+      } catch (err) {
+        console.error(err);
+      }
 
-  const canProceed = () => {
-    if (isChoiceStep) return !!answers[currentStep];
-    return formData[contactFields[contactIndex].key].trim().length > 0;
-  };
+      const params = new URLSearchParams({ nom: fullname, phone });
+      router.push(`/thank-you-amenagement?${params.toString()}`);
+    };
+    form?.addEventListener("submit", onSubmit);
 
-  const btnStyle = (active: boolean) => ({
-    flex: 1,
-    padding: "15px 20px",
-    borderRadius: "12px",
-    cursor: active ? "pointer" : "not-allowed",
-    backgroundColor: active ? C.orange : "rgba(255,107,0,0.25)",
-    border: "none",
-    color: "#fff",
-    fontWeight: 700 as const,
-    fontSize: "14px",
-    boxShadow: active ? "0 8px 24px -8px rgba(255,107,0,0.5)" : "none",
-    opacity: active ? 1 : 0.6,
-  });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      io?.disconnect();
+      stickyIo1?.disconnect();
+      stickyIo2?.disconnect();
+      form?.removeEventListener("submit", onSubmit);
+    };
+  }, [router]);
 
   return (
-    <section ref={sectionRef} id="candidature" style={{ padding: "24px 32px 96px", backgroundColor: C.ink }}>
-      <div style={{ maxWidth: "680px", margin: "0 auto" }}>
-        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} style={{ textAlign: "center", marginBottom: "48px" }}>
-          <h2 style={{ fontSize: "clamp(28px,4vw,50px)", fontWeight: 700, textTransform: "uppercase" as const, color: "#fff", marginBottom: "14px", lineHeight: 1.1 }}>
-            Réservez votre diagnostic <span className="rf-underline-word">gratuit</span>
-          </h2>
-          <p style={{ fontSize: "18px", color: "rgba(255,255,255,0.6)", lineHeight: 1.6 }}>Quelques questions pour personnaliser votre diagnostic. Moins de 2 minutes.</p>
-        </motion.div>
-
-        <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }} style={{ backgroundColor: "#fff", borderRadius: "24px", overflow: "hidden", boxShadow: "0 40px 80px -30px rgba(0,0,0,0.6)" }}>
-          <div style={{ height: "4px", backgroundColor: "rgba(10,10,10,0.08)" }}>
-            <motion.div style={{ height: "100%", backgroundColor: C.orange }} animate={{ width: `${progress}%` }} transition={{ duration: 0.4, ease: "easeOut" }} />
-          </div>
-
-          <div style={{ padding: "36px 32px" }}>
-            <AnimatePresence mode="wait">
-              {isChoiceStep ? (
-                <motion.div key={`c-${currentStep}`} initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} transition={{ duration: 0.3 }}>
-                  <p style={{ fontSize: "12px", color: C.inkFaint, textTransform: "uppercase" as const, letterSpacing: "0.12em", fontWeight: 700, marginBottom: "16px" }}>
-                    Étape {currentStep + 1} sur {TOTAL_STEPS}
-                  </p>
-                  <h3 style={{ fontSize: "18px", fontWeight: 700, color: C.ink, marginBottom: "24px", lineHeight: 1.4 }}>
-                    {qualifySteps[currentStep].headline}
-                  </h3>
-                  <div style={{ display: "flex", flexDirection: "column" as const, gap: "10px" }}>
-                    {qualifySteps[currentStep].options.map((opt) => {
-                      const sel = selected === opt.label;
-                      return (
-                        <button key={opt.label} type="button" onClick={() => handleSelectOption(opt)}
-                          style={{ width: "100%", textAlign: "left" as const, padding: "14px 18px", borderRadius: "12px", cursor: "pointer", backgroundColor: sel ? C.orangeSoft : "#fff", border: `1.5px solid ${sel ? C.orange : C.lineStrong}`, color: sel ? C.orange : C.ink, fontWeight: sel ? 700 : 500, fontSize: "15px", display: "flex", alignItems: "center", gap: "12px", transition: "all 0.2s" }}>
-                          <div style={{ width: "20px", height: "20px", borderRadius: "50%", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: sel ? C.orange : "transparent", border: `2px solid ${sel ? C.orange : C.lineStrong}` }}>
-                            {sel && <svg style={{ width: "12px", height: "12px", color: "#fff" }} fill="currentColor" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" /></svg>}
-                          </div>
-                          {opt.label}
-                        </button>
-                      );
-                    })}
-                  </div>
-                  <div style={{ display: "flex", gap: "12px", marginTop: "24px" }}>
-                    {currentStep > 0 && <button type="button" onClick={handleBack} style={{ flex: 1, padding: "15px 20px", borderRadius: "12px", cursor: "pointer", backgroundColor: "#fff", border: `1.5px solid ${C.lineStrong}`, color: C.inkSoft, fontWeight: 700, fontSize: "14px" }}>← Précédent</button>}
-                    <button type="button" onClick={handleNext} disabled={!canProceed()} style={btnStyle(canProceed())}>Suivant →</button>
-                  </div>
-                </motion.div>
-              ) : (
-                <motion.form key={`i-${currentStep}`} initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} transition={{ duration: 0.3 }}
-                  onSubmit={(e) => { e.preventDefault(); if (isLastStep) handleSubmit(e); else handleNext(); }}>
-                  <p style={{ fontSize: "12px", color: C.inkFaint, textTransform: "uppercase" as const, letterSpacing: "0.12em", fontWeight: 700, marginBottom: "16px" }}>
-                    Étape {currentStep + 1} sur {TOTAL_STEPS}
-                  </p>
-                  <h3 style={{ fontSize: "18px", fontWeight: 700, color: C.ink, marginBottom: "24px" }}>
-                    {contactFields[contactIndex].headline}
-                  </h3>
-                  <div>
-                    <label style={{ display: "block", fontSize: "13px", color: C.inkSoft, textTransform: "uppercase" as const, letterSpacing: "0.1em", fontWeight: 600, marginBottom: "8px" }}>
-                      {contactFields[contactIndex].label}
-                    </label>
-                    <input
-                      type={contactFields[contactIndex].type} required autoFocus
-                      value={formData[contactFields[contactIndex].key]}
-                      onChange={(e) => setFormData({ ...formData, [contactFields[contactIndex].key]: e.target.value })}
-                      placeholder={contactFields[contactIndex].placeholder}
-                      style={{ width: "100%", padding: "15px 16px", borderRadius: "12px", fontSize: "16px", color: C.ink, backgroundColor: "#fff", border: `1.5px solid ${C.lineStrong}`, outline: "none", fontFamily: "Inter Tight, system-ui, sans-serif" }}
-                      onFocus={(e) => { e.target.style.borderColor = C.orange; e.target.style.boxShadow = `0 0 0 4px ${C.orangeSoft}`; }}
-                      onBlur={(e) => { e.target.style.borderColor = C.lineStrong; e.target.style.boxShadow = "none"; }}
-                    />
-                  </div>
-                  <div style={{ display: "flex", gap: "12px", marginTop: "24px" }}>
-                    <button type="button" onClick={handleBack} style={{ flex: 1, padding: "15px 20px", borderRadius: "12px", cursor: "pointer", backgroundColor: "#fff", border: `1.5px solid ${C.lineStrong}`, color: C.inkSoft, fontWeight: 700, fontSize: "14px" }}>← Précédent</button>
-                    <button type="submit" disabled={!canProceed() || (isLastStep && isSubmitting)} style={btnStyle(canProceed())}>
-                      {isLastStep ? (isSubmitting ? "Envoi…" : "Confirmer ma demande →") : "Suivant →"}
-                    </button>
-                  </div>
-                </motion.form>
-              )}
-            </AnimatePresence>
-          </div>
-        </motion.div>
-      </div>
-    </section>
-  );
-}
-
-// ─── MAIN PAGE ─────────────────────────────────────────────────────────────
-export default function AmenagementPage() {
-  const [showSticky, setShowSticky] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-  useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth < 640);
-    check();
-    window.addEventListener("resize", check);
-    return () => window.removeEventListener("resize", check);
-  }, []);
-  const formRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    setShowSticky(true);
-    const form = formRef.current;
-    if (!form) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.target === form) setShowSticky(!entry.isIntersecting);
-        });
-      },
-      { threshold: 0.1 }
-    );
-    observer.observe(form);
-    return () => observer.disconnect();
-  }, []);
-
-  return (
-    <div style={{ backgroundColor: C.bg, color: C.ink, minHeight: "100vh", fontFamily: "Inter Tight, system-ui, sans-serif", overflowX: "hidden" }}>
-
-      {/* ── HEADER ── */}
-      <header style={{ position: "sticky", top: 0, zIndex: 50, backgroundColor: "rgba(255,255,255,0.88)", backdropFilter: "blur(14px)", WebkitBackdropFilter: "blur(14px)", borderBottom: `1px solid ${C.line}` }}>
-        <div style={{ maxWidth: "1180px", margin: "0 auto", padding: "0 24px", display: "flex", alignItems: "center", justifyContent: "center", height: "72px" }}>
-          <a href="#">
-            <img src="/logo.png" alt="Reachflow" style={{ height: "36px", width: "auto" }} />
-          </a>
-        </div>
-      </header>
-
-      {/* ── HERO ── */}
-      <section style={{ position: "relative", padding: "36px 0 48px", textAlign: "center", overflow: "hidden", background: "radial-gradient(900px 420px at 50% -8%,rgba(255,107,0,0.10),transparent 70%),linear-gradient(180deg,#fff 0%,#F5F4F1 100%)" }}>
-        <div style={{ position: "absolute", inset: 0, zIndex: 0, opacity: 0.5, backgroundImage: "radial-gradient(rgba(10,10,10,0.04) 1px,transparent 1px)", backgroundSize: "22px 22px", maskImage: "linear-gradient(180deg,#000,transparent 80%)", WebkitMaskImage: "linear-gradient(180deg,#000,transparent 80%)" }} />
-
-        <div style={{ maxWidth: "1180px", margin: "0 auto", padding: "0 24px", position: "relative", zIndex: 1 }}>
-          {/* Eyebrow — TODO ACHRAF: chiffre à vérifier */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
-            style={{ display: "inline-flex", alignItems: "center", gap: "9px", fontWeight: 700, fontSize: "13px", letterSpacing: "0.08em", textTransform: "uppercase", color: C.orange, backgroundColor: C.orangeSoft, padding: "8px 16px", borderRadius: "100px", marginBottom: "28px", border: "1px solid rgba(255,107,0,0.2)" }}>
-            <span style={{ width: "8px", height: "8px", borderRadius: "50%", backgroundColor: C.orange, display: "inline-block", animation: "rf-pulse 2s infinite" }} />
-            +20 entreprises d&rsquo;aménagement &amp; rénovation nous font déjà confiance
-          </motion.div>
-
-          <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
-            style={{ fontWeight: 700, fontSize: "clamp(26px,4vw,52px)", maxWidth: "22ch", margin: "0 auto 24px", lineHeight: 1.1, color: C.ink }}>
-            Votre potentiel de chantiers est{" "}
-            <span style={{ color: C.orange }}>bien supérieur</span>{" "}
-            à ce que vous exploitez aujourd&rsquo;hui.
-          </motion.h1>
-
-          <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
-            style={{ maxWidth: "62ch", margin: "0 auto 40px" }}>
-            <p style={{ fontSize: "clamp(16px,2vw,20px)", color: C.inkSoft, lineHeight: 1.6, marginBottom: "20px" }}>
-              Bouche-à-oreille, devis qui traînent, mois en dents de scie. Notre système attire{" "}
-              <strong style={{ color: C.ink, fontWeight: 800 }}>des demandes qualifiées</strong>, prêtes à lancer leur projet —
-              et vous accompagne jusqu&rsquo;à la structuration de votre équipe commerciale.
-            </p>
-          </motion.div>
-
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.35 }}
-            style={{ display: "flex", gap: "18px", justifyContent: "center", flexWrap: "wrap", fontSize: "14px", color: C.inkFaint, marginTop: "32px" }}>
-            {["Diagnostic 100% gratuit", "Sans engagement", "Réservé aux entreprises sérieuses"].map((item) => (
-              <span key={item} style={{ display: "inline-flex", alignItems: "center", gap: "7px" }}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke={C.orange} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                {item}
-              </span>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ── STATS STRIP — TODO ACHRAF: chiffres à vérifier ── */}
-      <div style={{ maxWidth: "980px", margin: "24px auto 0", position: "relative", zIndex: 5, padding: "0 20px" }}>
-        <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}
-          style={{ backgroundColor: "#fff", border: `1px solid ${C.line}`, borderRadius: "20px", boxShadow: "0 30px 60px -25px rgba(10,10,10,0.22)", display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", overflow: "hidden" }}>
-          {[
-            { num: "+20", label: "Entreprises d'aménagement & rénovation accompagnées", star: false },
-            { num: "+120M DH", label: "De projets accompagnés pour nos partenaires", star: true },
-            { num: "< 2 ans", label: "Pour construire ces résultats", star: false },
-          ].map((s, i) => (
-            <div key={i} style={{
-              padding: isMobile ? "28px 32px" : "34px 22px",
-              textAlign: isMobile ? "left" : "center",
-              borderLeft: !isMobile && i > 0 ? `1px solid ${C.line}` : "none",
-              borderTop: isMobile && i > 0 ? `1px solid ${C.line}` : "none",
-              backgroundColor: s.star ? C.orangeSoft : "transparent",
-              display: isMobile ? "flex" : "block",
-              alignItems: "center",
-              gap: isMobile ? "20px" : undefined,
-            }}>
-              <div style={{ fontWeight: 800, fontSize: isMobile ? "42px" : "clamp(36px,5vw,56px)", lineHeight: 1, color: s.star ? C.orange : C.ink, letterSpacing: "-0.02em", flexShrink: 0 }}>{s.num}</div>
-              <div style={{ fontSize: "15px", color: C.inkSoft, marginTop: isMobile ? 0 : "10px", fontWeight: 600, lineHeight: 1.4 }}>{s.label}</div>
-            </div>
-          ))}
-        </motion.div>
-      </div>
-
-      {/* ── FORM ── */}
-      <QualifierFormLight sectionRef={formRef} />
-
-      {/* ── TRUST / LOGOS ── */}
-      <section style={{ padding: "90px 0 60px", marginTop: "44px", borderBottom: `1px solid ${C.line}` }}>
-        <div style={{ textAlign: "center", fontSize: "13px", letterSpacing: "0.14em", textTransform: "uppercase", color: C.inkFaint, fontWeight: 700, marginBottom: "32px" }}>
-          Des entreprises qui génèrent déjà des résultats
-        </div>
-        <div style={{ position: "relative", overflow: "hidden", WebkitMaskImage: "linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)", maskImage: "linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)" }}>
-          <div style={{ display: "flex", gap: "64px", width: "max-content", animation: "rf-scroll 36s linear infinite" }}>
-            {doubled.map((logo, i) => (
-              <div key={i} style={{ flexShrink: 0, width: "160px", height: "72px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <img src={logo.src} alt={logo.alt} style={{ maxWidth: "100%", maxHeight: "100%", width: "100%", height: "100%", objectFit: "contain" }} />
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── MECHANISM ── */}
-      <section style={{ padding: "96px 0" }}>
-        <div style={{ maxWidth: "1180px", margin: "0 auto", padding: "0 24px" }}>
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} style={{ textAlign: "center", maxWidth: "760px", margin: "0 auto 60px" }}>
-            <span style={{ fontWeight: 700, fontSize: "13px", letterSpacing: "0.14em", textTransform: "uppercase", color: C.orange, display: "block", marginBottom: "16px" }}>Le Mécanisme</span>
-            <h2 style={{ fontSize: "clamp(30px,4.6vw,52px)", fontWeight: 700, textTransform: "uppercase", marginBottom: "14px", color: C.ink, lineHeight: 1.1 }}>Un système en 3 piliers</h2>
-            <p style={{ fontSize: "18px", color: C.inkSoft, lineHeight: 1.6 }}>Pas de hasard, pas de chance. Une machine de croissance sur-mesure, du diagnostic jusqu&rsquo;à la structuration de votre équipe.</p>
-          </motion.div>
-
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))", gap: "24px" }}>
-            {[
-              {
-                num: "PILIER 01",
-                icon: <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><path d="M21 21l-4.3-4.3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>,
-                title: "Le Diagnostic",
-                desc: "Un audit gratuit de votre entreprise qui détermine votre position exacte sur notre roadmap de croissance en 6 étapes, et ce qui vous bloque précisément.",
-              },
-              {
-                num: "PILIER 02",
-                icon: <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>,
-                title: "Le Filtre",
-                desc: "Une page et un process conçus pour capter des demandes qualifiées au coût le plus bas — pas des curieux qui font perdre du temps à votre équipe.",
-              },
-              {
-                num: "PILIER 03",
-                icon: <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>,
-                title: "L'Accompagnement",
-                desc: "On ne s'arrête pas au lead : acquisition, closing des devis, structuration de votre équipe commerciale — toute la chaîne jusqu'au chiffre d'affaires.",
-              },
-            ].map((p, i) => (
-              <motion.div key={i} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: i * 0.15 }}
-                whileHover={{ y: -6, boxShadow: "0 30px 60px -25px rgba(10,10,10,0.22)", borderColor: "transparent" }}
-                style={{ position: "relative", backgroundColor: C.bg, border: `1px solid ${C.line}`, borderRadius: "18px", padding: "38px 32px", transition: "all 0.3s", overflow: "hidden" }}>
-                <span style={{ fontWeight: 700, fontSize: "13px", color: C.orange, letterSpacing: "0.1em" }}>{p.num}</span>
-                <div style={{ width: "54px", height: "54px", borderRadius: "14px", backgroundColor: C.orangeSoft, display: "grid", placeItems: "center", margin: "18px 0 22px", color: C.orange }}>{p.icon}</div>
-                <h3 style={{ fontSize: "27px", fontWeight: 700, textTransform: "uppercase", marginBottom: "10px", color: C.ink }}>{p.title}</h3>
-                <p style={{ color: C.inkSoft, fontSize: "16px", lineHeight: 1.6 }}>{p.desc}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── TESTIMONIALS ──
-          Intentionally omitted: /agences-etudes plays real client audio
-          files (/public/audio/*.mp3). We have no real recordings for this
-          niche yet — fabricating names/quotes would repeat the fake-social-
-          proof problem already flagged and rejected for this project.
-          Add a section here (mirroring AudioCard in /agences-etudes) once
-          real recordings exist. */}
-
-      {/* ── FOOTER ── */}
-      <footer style={{ padding: "40px 0", textAlign: "center", backgroundColor: C.ink, color: "rgba(255,255,255,0.5)", fontSize: "14px" }}>
-        <div style={{ marginBottom: "14px", display: "flex", justifyContent: "center" }}>
-          <img src="/logo-white.png" alt="Reachflow" style={{ height: "32px", width: "auto" }} />
-        </div>
-        © 2026 Reachflow. Tous droits réservés.
-      </footer>
-
-      {/* ── STICKY CTA ── */}
-      <AnimatePresence>
-        {showSticky && (
-          <motion.div
-            initial={{ y: 80, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 80, opacity: 0 }}
-            transition={{ type: "spring", stiffness: 300, damping: 28 }}
-            style={{ position: "fixed", bottom: "24px", left: 0, right: 0, display: "flex", justifyContent: "center", zIndex: 100, pointerEvents: "none" }}
-          >
-            <a href="#candidature" style={{ display: "inline-flex", alignItems: "center", gap: "10px", backgroundColor: C.orange, color: "#fff", fontWeight: 700, fontSize: "16px", padding: "16px 36px", borderRadius: "100px", textDecoration: "none", boxShadow: "0 16px 40px -8px rgba(255,107,0,0.65)", pointerEvents: "auto" }}>
-              Découvrez si votre entreprise est éligible →
-            </a>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* ── GLOBAL STYLES FOR THIS PAGE ── */}
-      <style>{`
-        @keyframes rf-pulse {
-          0%   { box-shadow: 0 0 0 0 rgba(255,107,0,.45); }
-          70%  { box-shadow: 0 0 0 12px rgba(255,107,0,0); }
-          100% { box-shadow: 0 0 0 0 rgba(255,107,0,0); }
-        }
-        @keyframes rf-scroll {
-          0%   { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
-        }
-        @keyframes rf-underline {
-          0%   { transform: scaleX(0); transform-origin: left; }
-          45%  { transform: scaleX(1); transform-origin: left; }
-          50%  { transform: scaleX(1); transform-origin: right; }
-          95%  { transform: scaleX(0); transform-origin: right; }
-          100% { transform: scaleX(0); transform-origin: left; }
-        }
-        .rf-underline-word {
-          position: relative;
-          color: #FF6B00;
-          display: inline-block;
-        }
-        .rf-underline-word::after {
-          content: '';
-          position: absolute;
-          left: 0; right: 0; bottom: -3px;
-          height: 3px;
-          border-radius: 2px;
-          background: #FF6B00;
-          transform: scaleX(0);
-          transform-origin: left;
-          animation: rf-underline 2.8s ease-in-out infinite;
-        }
-      `}</style>
+    <div id="rf-lp" ref={rootRef}>
+      <style dangerouslySetInnerHTML={{ __html: PAGE_STYLES }} />
+      <div dangerouslySetInnerHTML={{ __html: PAGE_HTML }} />
     </div>
   );
 }
