@@ -2,11 +2,7 @@ import type { Metadata } from "next";
 import { Space_Grotesk, Inter } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
-import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
-import CustomCursor from "@/components/layout/CustomCursor";
-import GrainOverlay from "@/components/layout/GrainOverlay";
-import WhatsAppButton from "@/components/layout/WhatsAppButton";
+import SiteShell from "@/components/layout/SiteShell";
 import Analytics from "@/components/Analytics";
 
 const spaceGrotesk = Space_Grotesk({
@@ -154,12 +150,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         >
           Aller au contenu principal
         </a>
-        <CustomCursor />
-        <GrainOverlay />
-        <Navbar />
-        <main id="main-content">{children}</main>
-        <Footer />
-        <WhatsAppButton />
+        <SiteShell>{children}</SiteShell>
         <Analytics />
         <Script
           src="https://widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js"
