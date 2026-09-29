@@ -16,7 +16,7 @@ function doPost(e) {
     if (sheet.getLastRow() === 0) {
       sheet.appendRow([
         'Date', 'Nom complet', 'Téléphone', 'Email', 'Entreprise',
-        'Types de projets', 'Éligible', 'Source'
+        'Types de projets', 'Source'
       ]);
     }
 
@@ -27,7 +27,6 @@ function doPost(e) {
       data.email || '',
       data.entreprise || '',
       data.typesDeProjets || '',
-      data.eligible === 'true' || data.eligible === true ? 'Oui' : 'Non',
       data.source || 'amenagement'
     ]);
 

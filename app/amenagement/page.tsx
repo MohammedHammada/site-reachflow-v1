@@ -717,7 +717,6 @@ export default function AmenagementPage() {
         email,
         entreprise: company,
         typesDeProjets: projectTypes.join(", "),
-        eligible: true,
         source: "amenagement",
         datetime,
       };
