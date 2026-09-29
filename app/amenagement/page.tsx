@@ -209,6 +209,18 @@ const PAGE_STYLES = `
   #rf-lp .proof-number{font-weight:700; font-size:clamp(2.4rem,5.4vw,3.6rem); color:#fff; letter-spacing:-0.02em; position:relative;}
   #rf-lp .proof-banner p{margin-top:10px; font-size:1.02rem; color:rgba(255,255,255,0.9); position:relative;}
 
+  #rf-lp .results-label{ text-align:center; margin:44px 0 24px; font-size:0.95rem; font-weight:600; color:var(--text-muted); }
+  #rf-lp .results-grid{ column-count:3; column-gap:16px; }
+  @media (max-width:900px){ #rf-lp .results-grid{ column-count:2; } }
+  @media (max-width:560px){ #rf-lp .results-grid{ column-count:1; } }
+  #rf-lp .results-item{
+    break-inside:avoid; margin-bottom:16px; border-radius:var(--radius-m); overflow:hidden;
+    border:1px solid var(--border); box-shadow:var(--shadow-s);
+    transition:transform 250ms var(--ease), box-shadow 250ms var(--ease);
+  }
+  #rf-lp .results-item:hover{ transform:translateY(-4px); box-shadow:0 16px 36px color-mix(in srgb, var(--accent) 20%, transparent); }
+  #rf-lp .results-item img{ display:block; width:100%; height:auto; }
+
   #rf-lp .test-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:20px; margin-bottom:20px;}
   @media (max-width:720px){ #rf-lp .test-grid{grid-template-columns:1fr;} }
   #rf-lp .test-audio{ background:var(--bg-elevated); border:1px solid var(--border); border-radius:var(--radius-m); padding:24px; display:flex; flex-direction:column; gap:12px; box-shadow:var(--shadow-s); }
@@ -485,6 +497,15 @@ const PAGE_HTML = `
     <div class="proof-banner" data-reveal>
       <div class="proof-number">+120 millions de dirhams</div>
       <p>de projets accompagnés pour nos partenaires en <span class="hl-light">moins de 2 ans</span>.</p>
+    </div>
+
+    <p class="results-label" data-reveal>Comme on le répète toujours, faites confiance aux chiffres.</p>
+    <div class="results-grid" data-reveal>
+      <div class="results-item"><img src="/results/crm-pipeline.jpg" alt="Pipeline CRM ReachFlow — opportunités aménagement et rénovation" loading="lazy"></div>
+      <div class="results-item"><img src="/results/calendar-1.jpg" alt="Calendrier de chantiers aménagement — visites, plans, points d'étape" loading="lazy"></div>
+      <div class="results-item"><img src="/results/performance-chart.png" alt="Analyse de performance — croissance du nombre de clients convertis" loading="lazy"></div>
+      <div class="results-item"><img src="/results/calendar-2.jpg" alt="Calendrier de chantiers aménagement — rendez-vous clients" loading="lazy"></div>
+      <div class="results-item"><img src="/results/calendar-3.jpg" alt="Calendrier de chantiers aménagement — suivi technique" loading="lazy"></div>
     </div>
   </div>
 </section>
