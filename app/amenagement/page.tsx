@@ -617,6 +617,14 @@ export default function AmenagementPage() {
       input?.addEventListener("change", () => opt.classList.toggle("active", input.checked));
     });
 
+    const phoneInputEl = root.querySelector<HTMLInputElement>("#phone");
+    const onPhoneInput = () => {
+      if (!phoneInputEl) return;
+      const filtered = phoneInputEl.value.replace(/[^\d\s()+-]/g, "");
+      if (filtered !== phoneInputEl.value) phoneInputEl.value = filtered;
+    };
+    phoneInputEl?.addEventListener("input", onPhoneInput);
+
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const revealTargets = root.querySelectorAll<HTMLElement>("[data-reveal]");
     let io: IntersectionObserver | null = null;
@@ -775,6 +783,7 @@ export default function AmenagementPage() {
       stickyIo2?.disconnect();
       form?.removeEventListener("submit", onSubmit);
       nextBtn?.removeEventListener("click", onNext);
+      phoneInputEl?.removeEventListener("input", onPhoneInput);
     };
   }, [router]);
 

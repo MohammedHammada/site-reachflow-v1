@@ -267,6 +267,14 @@ function ThankYouContent() {
       revealTargets.forEach((el) => el.classList.add("is-visible"));
     }
 
+    const waPhoneEl = root.querySelector<HTMLInputElement>("#waPhone");
+    const onWaPhoneInput = () => {
+      if (!waPhoneEl) return;
+      const filtered = waPhoneEl.value.replace(/[^\d\s()+-]/g, "");
+      if (filtered !== waPhoneEl.value) waPhoneEl.value = filtered;
+    };
+    waPhoneEl?.addEventListener("input", onWaPhoneInput);
+
     const updateForm = root.querySelector<HTMLFormElement>("#updateForm");
     const onSubmit = async (e: Event) => {
       e.preventDefault();
@@ -304,8 +312,9 @@ function ThankYouContent() {
     return () => {
       io?.disconnect();
       updateForm?.removeEventListener("submit", onSubmit);
+      waPhoneEl?.removeEventListener("input", onWaPhoneInput);
     };
-  }, [nom, phoneFromLp]);
+  }, [nom, phoneFromLp, emailFromLp, entrepriseFromLp, typesFromLp]);
 
   return (
     <div id="rf-ty" ref={rootRef}>
