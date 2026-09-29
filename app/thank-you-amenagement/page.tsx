@@ -231,6 +231,9 @@ function ThankYouContent() {
   const params = useSearchParams();
   const nom = params.get("nom")?.trim();
   const phoneFromLp = params.get("phone")?.trim() || "";
+  const emailFromLp = params.get("email")?.trim() || "";
+  const entrepriseFromLp = params.get("entreprise")?.trim() || "";
+  const typesFromLp = params.get("types")?.trim() || "";
 
   useEffect(() => {
     const root = rootRef.current;
@@ -267,7 +270,14 @@ function ThankYouContent() {
     const updateForm = root.querySelector<HTMLFormElement>("#updateForm");
     const onSubmit = async (e: Event) => {
       e.preventDefault();
-      const newPhone = (root.querySelector<HTMLInputElement>("#waPhone")?.value || "").trim();
+      const phoneInput = root.querySelector<HTMLInputElement>("#waPhone");
+      const newPhone = (phoneInput?.value || "").trim();
+      const digits = newPhone.replace(/\D/g, "");
+      if (digits.length < 9 || digits.length > 14 || !/^[\d\s()+-]+$/.test(newPhone)) {
+        alert("Merci d'entrer un numéro de téléphone valide (chiffres uniquement).");
+        phoneInput?.focus();
+        return;
+      }
       try {
         await fetch("/api/submit-lead", {
           method: "POST",
@@ -275,9 +285,11 @@ function ThankYouContent() {
           body: JSON.stringify({
             nomComplet: nom || "",
             telephone: newPhone,
-            note: `Correction de numéro (ancien: ${phoneFromLp || "inconnu"})`,
+            email: emailFromLp,
+            entreprise: entrepriseFromLp,
+            typesDeProjets: typesFromLp,
+            note: `Correction de numéro — ancien: ${phoneFromLp || "inconnu"}`,
             source: "amenagement-correction-numero",
-            eligible: true,
             isDisqualified: false,
           }),
         });

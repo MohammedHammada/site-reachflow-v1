@@ -16,7 +16,7 @@ function doPost(e) {
     if (sheet.getLastRow() === 0) {
       sheet.appendRow([
         'Date', 'Nom complet', 'Téléphone', 'Email', 'Entreprise',
-        'Types de projets', 'Source'
+        'Types de projets', 'Source', 'Note'
       ]);
     }
 
@@ -27,7 +27,8 @@ function doPost(e) {
       data.email || '',
       data.entreprise || '',
       data.typesDeProjets || '',
-      data.source || 'amenagement'
+      data.source || 'amenagement',
+      data.note || ''
     ]);
 
     return ContentService

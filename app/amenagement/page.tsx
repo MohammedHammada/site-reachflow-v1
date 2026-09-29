@@ -699,11 +699,16 @@ export default function AmenagementPage() {
         alert("Merci de sélectionner au moins un type de projet.");
         return;
       }
-      if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = "Envoi…"; }
-
       const fullname = (form.querySelector<HTMLInputElement>("#fullname")?.value || "").trim();
       const phone = (form.querySelector<HTMLInputElement>("#phone")?.value || "").trim();
       const email = (form.querySelector<HTMLInputElement>("#email")?.value || "").trim();
+      const phoneDigits = phone.replace(/\D/g, "");
+      if (phoneDigits.length < 9 || phoneDigits.length > 14 || !/^[\d\s()+-]+$/.test(phone)) {
+        alert("Merci d'entrer un numéro de téléphone valide (chiffres uniquement).");
+        form.querySelector<HTMLInputElement>("#phone")?.focus();
+        return;
+      }
+      if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = "Envoi…"; }
       const company = (form.querySelector<HTMLInputElement>("#company")?.value || "").trim();
       const projectTypes = Array.from(checks).map((c) => c.value);
       const datetime = (() => {
@@ -752,7 +757,13 @@ export default function AmenagementPage() {
         console.error(err);
       }
 
-      const params = new URLSearchParams({ nom: fullname, phone });
+      const params = new URLSearchParams({
+        nom: fullname,
+        phone,
+        email,
+        entreprise: company,
+        types: projectTypes.join(", "),
+      });
       router.push(`/thank-you-amenagement?${params.toString()}`);
     };
     form?.addEventListener("submit", onSubmit);
