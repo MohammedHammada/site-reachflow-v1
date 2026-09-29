@@ -478,6 +478,7 @@ const PAGE_HTML = `
                 <label class="check-opt"><input type="checkbox" name="type" value="amenagement"> Aménagement intérieur clé-en-main</label>
                 <label class="check-opt"><input type="checkbox" name="type" value="cuisine-sdb"> Cuisine &amp; salle de bain</label>
                 <label class="check-opt"><input type="checkbox" name="type" value="tertiaire"> Bureaux &amp; locaux commerciaux</label>
+                <label class="check-opt"><input type="checkbox" name="type" value="autres"> Autres</label>
               </div>
             </div>
             <button type="button" class="btn btn-block" id="formNextBtn">Continuer</button>
