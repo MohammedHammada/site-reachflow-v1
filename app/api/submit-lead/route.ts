@@ -4,13 +4,20 @@ const QUALIFIED_URL =
   "https://script.google.com/macros/s/AKfycbwjS8xZwKWeZ0s-vJ2Zt1a9S_04lsHODdzWEc7RkZPTeddn2pSP2LzIF4jBQVo6pmTZFw/exec";
 const JUNK_URL =
   "https://script.google.com/macros/s/AKfycbx2ubYkSJMA_eH5uR0ewpcp5rcqP27MxLZvg6dLNVK2gPDeUDmEBi-bvlShY8gEQJ0u/exec";
+const AMENAGEMENT_URL =
+  "https://script.google.com/macros/s/AKfycbyeG2nwuAwDoekcnSyT7DTh_4YgKr6tHTANCarywAW450lYlnmaWXsGt467v-R6FaGDmg/exec";
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const { isDisqualified, ...payload } = body;
 
-    const sheetUrl = isDisqualified ? JUNK_URL : QUALIFIED_URL;
+    const source = String((payload as Record<string, unknown>).source || "");
+    const sheetUrl = source.startsWith("amenagement")
+      ? AMENAGEMENT_URL
+      : isDisqualified
+      ? JUNK_URL
+      : QUALIFIED_URL;
 
     const params = new URLSearchParams();
     Object.entries(payload).forEach(([k, v]) => params.append(k, String(v)));
