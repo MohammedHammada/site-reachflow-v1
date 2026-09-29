@@ -203,6 +203,15 @@ const PAGE_STYLES = `
   #rf-lp .check-opt input{accent-color:var(--accent);}
   #rf-lp .check-opt.active{border-color:var(--accent); background:color-mix(in srgb, var(--accent) 8%, var(--bg));}
   #rf-lp .form-note{font-size:0.86rem; margin-top:18px;}
+  #rf-lp .form-progress{margin-bottom:26px;}
+  #rf-lp .form-progress-bar{height:5px; border-radius:99px; background:var(--bg); overflow:hidden;}
+  #rf-lp .form-progress-fill{height:100%; width:50%; border-radius:99px; background:var(--gradient-brand); transition:width 380ms var(--ease);}
+  #rf-lp .form-progress-label{display:block; margin-top:9px; font-size:0.8rem; font-weight:600; color:var(--text-muted);}
+  #rf-lp .form-step{display:none;}
+  #rf-lp .form-step.is-active{display:block; animation:rfStepIn 320ms var(--ease);}
+  @keyframes rfStepIn{ from{opacity:0; transform:translateX(10px);} to{opacity:1; transform:translateX(0);} }
+  #rf-lp .btn-back{display:block; width:100%; text-align:center; background:none; border:none; color:var(--text-muted); font-size:0.86rem; font-weight:600; padding:10px 0 14px; cursor:pointer; transition:color 160ms var(--ease);}
+  #rf-lp .btn-back:hover{color:var(--text);}
 
   #rf-lp .proof-banner{ position:relative; background:var(--gradient-brand); border-radius:var(--radius-l); padding:56px 32px; text-align:center; box-shadow:0 20px 50px color-mix(in srgb, var(--accent) 35%, transparent); overflow:hidden; }
   #rf-lp .proof-banner::before{ content:""; position:absolute; inset:0; background:radial-gradient(circle at 20% 20%, rgba(255,255,255,0.25) 0%, transparent 45%); pointer-events:none; }
@@ -452,40 +461,46 @@ const PAGE_HTML = `
       </div>
 
       <div class="form-card" data-reveal>
+        <div class="form-progress">
+          <div class="form-progress-bar"><div class="form-progress-fill" id="formProgressFill"></div></div>
+          <span class="form-progress-label" id="formProgressLabel">Étape 1 sur 2</span>
+        </div>
         <form id="leadForm">
-          <div class="field">
-            <label for="fullname">Nom complet *</label>
-            <input type="text" id="fullname" required>
-          </div>
-          <div class="field">
-            <label for="phone">Téléphone *
-              <span class="hint"><span class="hl">Requis :</span> ce numéro doit être lié à un <span class="hl">compte WhatsApp actif</span> pour que notre expert puisse valider votre dossier.</span>
-            </label>
-            <input type="tel" id="phone" required>
-          </div>
-          <div class="field">
-            <label for="email">Email *</label>
-            <input type="email" id="email" required>
-          </div>
-          <div class="field">
-            <label for="company">Nom de l'entreprise *</label>
-            <input type="text" id="company" required>
-          </div>
-          <div class="field">
-            <label for="insta">Page Instagram ou site web *</label>
-            <input type="text" id="insta" required>
-          </div>
-          <div class="field">
-            <label>Quel type de projets réalisez-vous principalement ? *</label>
-            <div class="check-grid">
-              <label class="check-opt"><input type="checkbox" name="type" value="renovation"> Rénovation complète de logement</label>
-              <label class="check-opt"><input type="checkbox" name="type" value="amenagement"> Aménagement intérieur clé-en-main</label>
-              <label class="check-opt"><input type="checkbox" name="type" value="cuisine-sdb"> Cuisine &amp; salle de bain</label>
-              <label class="check-opt"><input type="checkbox" name="type" value="tertiaire"> Bureaux &amp; locaux commerciaux</label>
+          <div class="form-step is-active" id="formStep1">
+            <div class="field">
+              <label for="company">Nom de l'entreprise *</label>
+              <input type="text" id="company" required>
             </div>
+            <div class="field">
+              <label>Quel type de projets réalisez-vous principalement ? *</label>
+              <div class="check-grid">
+                <label class="check-opt"><input type="checkbox" name="type" value="renovation"> Rénovation complète de logement</label>
+                <label class="check-opt"><input type="checkbox" name="type" value="amenagement"> Aménagement intérieur clé-en-main</label>
+                <label class="check-opt"><input type="checkbox" name="type" value="cuisine-sdb"> Cuisine &amp; salle de bain</label>
+                <label class="check-opt"><input type="checkbox" name="type" value="tertiaire"> Bureaux &amp; locaux commerciaux</label>
+              </div>
+            </div>
+            <button type="button" class="btn btn-block" id="formNextBtn">Continuer</button>
           </div>
-          <button type="submit" class="btn btn-block" id="leadSubmitBtn">Voir si mon entreprise est éligible</button>
-          <p class="form-note"><span class="hl-soft">Aucun paiement</span> ne vous sera demandé sans accord mutuel préalable.</p>
+          <div class="form-step" id="formStep2">
+            <div class="field">
+              <label for="fullname">Nom complet *</label>
+              <input type="text" id="fullname" required>
+            </div>
+            <div class="field">
+              <label for="phone">Téléphone *
+                <span class="hint"><span class="hl">Requis :</span> ce numéro doit être lié à un <span class="hl">compte WhatsApp actif</span> pour que notre expert puisse valider votre dossier.</span>
+              </label>
+              <input type="tel" id="phone" required>
+            </div>
+            <div class="field">
+              <label for="email">Email *</label>
+              <input type="email" id="email" required>
+            </div>
+            <button type="button" class="btn-back" id="formBackBtn">&larr; Retour</button>
+            <button type="submit" class="btn btn-block" id="leadSubmitBtn">Voir si mon entreprise est éligible</button>
+            <p class="form-note"><span class="hl-soft">Aucun paiement</span> ne vous sera demandé sans accord mutuel préalable.</p>
+          </div>
         </form>
       </div>
     </div>
@@ -644,11 +659,42 @@ export default function AmenagementPage() {
 
     const form = root.querySelector<HTMLFormElement>("#leadForm");
     const submitBtn = root.querySelector<HTMLButtonElement>("#leadSubmitBtn");
+    const step1 = root.querySelector<HTMLElement>("#formStep1");
+    const step2 = root.querySelector<HTMLElement>("#formStep2");
+    const nextBtn = root.querySelector<HTMLButtonElement>("#formNextBtn");
+    const backBtn = root.querySelector<HTMLButtonElement>("#formBackBtn");
+    const progressFill = root.querySelector<HTMLElement>("#formProgressFill");
+    const progressLabel = root.querySelector<HTMLElement>("#formProgressLabel");
+    const goToStep = (n: 1 | 2) => {
+      step1?.classList.toggle("is-active", n === 1);
+      step2?.classList.toggle("is-active", n === 2);
+      if (progressFill) progressFill.style.width = n === 1 ? "50%" : "100%";
+      if (progressLabel) progressLabel.textContent = n === 1 ? "Étape 1 sur 2" : "Étape 2 sur 2";
+      if (n === 2) form?.querySelector<HTMLInputElement>("#fullname")?.focus();
+    };
+    const onNext = () => {
+      const company = form?.querySelector<HTMLInputElement>("#company");
+      const checks = form?.querySelectorAll<HTMLInputElement>('input[name="type"]:checked') ?? [];
+      if (!company?.value.trim()) {
+        alert("Merci d'indiquer le nom de votre entreprise.");
+        company?.focus();
+        return;
+      }
+      if (checks.length === 0) {
+        alert("Merci de sélectionner au moins un type de projet.");
+        return;
+      }
+      goToStep(2);
+    };
+    nextBtn?.addEventListener("click", onNext);
+    backBtn?.addEventListener("click", () => goToStep(1));
+
     const onSubmit = async (e: Event) => {
       e.preventDefault();
       if (!form) return;
       const checks = form.querySelectorAll<HTMLInputElement>('input[name="type"]:checked');
       if (checks.length === 0) {
+        goToStep(1);
         alert("Merci de sélectionner au moins un type de projet.");
         return;
       }
@@ -658,7 +704,6 @@ export default function AmenagementPage() {
       const phone = (form.querySelector<HTMLInputElement>("#phone")?.value || "").trim();
       const email = (form.querySelector<HTMLInputElement>("#email")?.value || "").trim();
       const company = (form.querySelector<HTMLInputElement>("#company")?.value || "").trim();
-      const insta = (form.querySelector<HTMLInputElement>("#insta")?.value || "").trim();
       const projectTypes = Array.from(checks).map((c) => c.value);
       const datetime = (() => {
         const n = new Date();
@@ -671,7 +716,6 @@ export default function AmenagementPage() {
         telephone: phone,
         email,
         entreprise: company,
-        instagramOuSite: insta,
         typesDeProjets: projectTypes.join(", "),
         eligible: true,
         source: "amenagement",
@@ -719,6 +763,7 @@ export default function AmenagementPage() {
       stickyIo1?.disconnect();
       stickyIo2?.disconnect();
       form?.removeEventListener("submit", onSubmit);
+      nextBtn?.removeEventListener("click", onNext);
     };
   }, [router]);
 
