@@ -501,11 +501,16 @@ const PAGE_HTML = `
 
     <p class="results-label" data-reveal>Comme on le répète toujours, faites confiance aux chiffres.</p>
     <div class="results-grid" data-reveal>
-      <div class="results-item"><img src="/results/crm-pipeline.jpg" alt="Pipeline CRM ReachFlow — opportunités aménagement et rénovation" loading="lazy"></div>
+      <div class="results-item"><img src="/results/payment-1.jpg" alt="Notification de nouveau paiement client ReachFlow" loading="lazy"></div>
+      <div class="results-item"><img src="/results/payment-2.jpg" alt="Notification de nouveau paiement client ReachFlow" loading="lazy"></div>
+      <div class="results-item"><img src="/results/payment-3.jpg" alt="Notification de nouveau paiement client ReachFlow" loading="lazy"></div>
+      <div class="results-item"><img src="/results/payment-4.jpg" alt="Notification de nouveau paiement client ReachFlow" loading="lazy"></div>
       <div class="results-item"><img src="/results/calendar-1.jpg" alt="Calendrier de chantiers aménagement — visites, plans, points d'étape" loading="lazy"></div>
-      <div class="results-item"><img src="/results/performance-chart.png" alt="Analyse de performance — croissance du nombre de clients convertis" loading="lazy"></div>
       <div class="results-item"><img src="/results/calendar-2.jpg" alt="Calendrier de chantiers aménagement — rendez-vous clients" loading="lazy"></div>
       <div class="results-item"><img src="/results/calendar-3.jpg" alt="Calendrier de chantiers aménagement — suivi technique" loading="lazy"></div>
+      <div class="results-item"><img src="/results/crm-stages.jpg" alt="Répartition des opportunités CRM ReachFlow par étape" loading="lazy"></div>
+      <div class="results-item"><img src="/results/crm-pipeline.jpg" alt="Pipeline CRM ReachFlow — opportunités aménagement et rénovation" loading="lazy"></div>
+      <div class="results-item"><img src="/results/performance-chart.jpg" alt="Analyse de performance — croissance du nombre de clients convertis" loading="lazy"></div>
     </div>
   </div>
 </section>
