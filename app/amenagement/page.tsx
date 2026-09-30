@@ -105,7 +105,15 @@ const PAGE_STYLES = `
   #rf-lp .hero-roadmap{ max-width:560px; margin:32px auto 32px; }
   @media (max-width:720px){ #rf-lp .hero-roadmap{ margin:26px auto 26px; } }
   #rf-lp .hero h1{margin-bottom:22px;}
-  #rf-lp .hero .lede{font-size:1.14rem; max-width:46ch; margin:0 auto 30px; color:var(--text-muted);}
+  #rf-lp .hero .lede{font-size:1.14rem; max-width:46ch; margin:0 auto 24px; color:var(--text-muted);}
+
+  #rf-lp .niche-tags-label{display:block; text-align:center; font-size:0.86rem; color:var(--text-muted); margin-bottom:12px;}
+  #rf-lp .niche-tags{display:flex; flex-wrap:wrap; gap:8px; justify-content:center; max-width:580px; margin:0 auto 28px;}
+  #rf-lp .niche-tag{font-size:0.82rem; font-weight:600; padding:9px 17px; border-radius:var(--radius-pill); border:1px solid var(--border); background:var(--bg-elevated); color:var(--text); cursor:pointer; transition:border-color 160ms var(--ease), background 160ms var(--ease), transform 120ms var(--ease); white-space:nowrap;}
+  #rf-lp .niche-tag:hover{border-color:var(--accent); background:color-mix(in srgb, var(--accent) 10%, var(--bg-elevated));}
+  #rf-lp .niche-tag:active{transform:scale(0.95);}
+  #rf-lp .niche-tag.is-selected{border-color:var(--accent); background:color-mix(in srgb, var(--accent) 16%, var(--bg-elevated)); color:var(--accent-ink);}
+  @media (max-width:640px){ #rf-lp .niche-tags{gap:7px;} #rf-lp .niche-tag{font-size:0.76rem; padding:7px 14px;} }
 
   #rf-lp .roadmap-card{
     position:relative; background:var(--bg-elevated); border:2px solid color-mix(in srgb, var(--accent) 65%, var(--border));
@@ -170,6 +178,19 @@ const PAGE_STYLES = `
     #rf-lp .growth-step strong{ font-size:clamp(1.05rem, 5.8vw, 1.3rem); display:block; }
     #rf-lp .growth-step span{ max-width:none; white-space:normal; }
   }
+
+  #rf-lp .pain-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:22px; margin-bottom:32px;}
+  @media (max-width:820px){ #rf-lp .pain-grid{grid-template-columns:1fr;} }
+  #rf-lp .pain-card{background:var(--bg-elevated); border:1px solid var(--border); border-radius:var(--radius-m); padding:26px; box-shadow:var(--shadow-s);}
+  #rf-lp .pain-card p{color:var(--text); font-size:1rem; line-height:1.5; margin:0;}
+  #rf-lp .pain-icon{width:40px; height:40px; border-radius:12px; background:color-mix(in srgb, var(--accent-2) 16%, var(--bg-elevated)); color:var(--accent-2); display:flex; align-items:center; justify-content:center; margin-bottom:16px;}
+  #rf-lp .pain-closing{text-align:center; font-size:1.15rem; font-weight:700; color:var(--text); max-width:620px; margin:0 auto;}
+
+  #rf-lp .guarantee-block{background:var(--bg-elevated); border:1px solid var(--border); border-radius:var(--radius-l); padding:52px 40px; text-align:center; box-shadow:var(--shadow-m);}
+  @media (max-width:640px){ #rf-lp .guarantee-block{padding:36px 22px;} }
+  #rf-lp .guarantee-block h2{margin-bottom:16px;}
+  #rf-lp .guarantee-block p{max-width:620px; margin:0 auto; font-size:1.05rem;}
+  #rf-lp .scarcity-badge{display:inline-flex; align-items:center; gap:8px; margin-top:24px; padding:11px 22px; border-radius:var(--radius-pill); background:color-mix(in srgb, var(--accent-2) 16%, var(--bg)); border:1px solid color-mix(in srgb, var(--accent-2) 40%, var(--border)); color:var(--accent-2); font-weight:700; font-size:0.88rem;}
 
   #rf-lp .approach-grid{display:grid; grid-template-columns:1fr 1fr; gap:64px; align-items:center;}
   @media (max-width:820px){ #rf-lp .approach-grid{grid-template-columns:1fr; gap:32px;} }
@@ -329,13 +350,22 @@ const PAGE_HTML = `
 
     <div class="hero-content">
       <div>
-        <h1>Votre entreprise d'aménagement et de rénovation a un potentiel de chantiers <span class="gradient-text">bien supérieur</span> à ce que vous exploitez aujourd'hui.</h1>
-        <p class="lede"><span class="hl">Bouche-à-oreille</span>, devis qui traînent — découvrez <span class="hl">gratuitement</span> à quelle étape de croissance vous êtes bloqué, et le <span class="hl">plan exact</span> pour la débloquer.</p>
+        <h1>Entreprises d'aménagement et de rénovation : un <span class="gradient-text">carnet de chantiers plein</span> toute l'année, sans dépendre du bouche-à-oreille.</h1>
+        <p class="lede">On installe tout le système — <span class="hl">publicités</span>, <span class="hl">qualification WhatsApp</span>, <span class="hl">relance des devis</span>. Vous, vous ne faites que les visites de chantier.</p>
+
+        <div class="niche-tags-label">Vous vous reconnaissez ?</div>
+        <div class="niche-tags" id="nicheTags">
+          <button type="button" class="niche-tag" data-project-type="renovation">Rénovation complète</button>
+          <button type="button" class="niche-tag" data-project-type="amenagement">Aménagement clé-en-main</button>
+          <button type="button" class="niche-tag" data-project-type="cuisine-sdb">Cuisine &amp; salle de bain</button>
+          <button type="button" class="niche-tag" data-project-type="tertiaire">Bureaux &amp; commerces</button>
+          <button type="button" class="niche-tag" data-project-type="menuiserie">Menuiserie</button>
+        </div>
 
         <a href="#form" class="btn">Découvrez si votre entreprise est éligible</a>
         <div class="micro-risk">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>
-          <span><span class="hl-soft">Aucun paiement</span> ne vous sera demandé sans accord mutuel préalable.</span>
+          <span><span class="hl-soft">Diagnostic de 30 min, offert.</span> Si on ne voit pas comment vous apporter plus de chantiers, on vous le dit franchement — et on s'arrête là.</span>
         </div>
 
         <div class="hero-roadmap">
@@ -347,6 +377,29 @@ const PAGE_HTML = `
         </div>
       </div>
     </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="section-head center" data-reveal>
+      <h2>Vous reconnaissez l'une de ces situations ?</h2>
+    </div>
+    <div class="pain-grid">
+      <div class="pain-card" data-reveal>
+        <div class="pain-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg></div>
+        <p>Le devis à 80 000 MAD envoyé il y a 3 semaines, toujours sans réponse.</p>
+      </div>
+      <div class="pain-card" data-reveal>
+        <div class="pain-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div>
+        <p>Les mois creux où votre équipe attend un chantier.</p>
+      </div>
+      <div class="pain-card" data-reveal>
+        <div class="pain-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7-6.2-3.8-6.2 3.8 1.6-7-5.4-4.7 7.1-.6z"/></svg></div>
+        <p>Les clients qui vous comparent au moins cher, au lieu de choisir la qualité.</p>
+      </div>
+    </div>
+    <p class="pain-closing" data-reveal>Ce n'est pas un problème de savoir-faire. C'est un problème de système.</p>
   </div>
 </section>
 
@@ -389,7 +442,7 @@ const PAGE_HTML = `
       <a href="#form" class="btn">Découvrez si votre entreprise est éligible</a>
       <div class="micro-risk">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>
-        <span><span class="hl-soft">Aucun paiement</span> ne vous sera demandé sans accord mutuel préalable.</span>
+        <span><span class="hl-soft">Diagnostic de 30 min, offert.</span> Si on ne voit pas comment vous apporter plus de chantiers, on vous le dit franchement — et on s'arrête là.</span>
       </div>
     </div>
   </div>
@@ -398,8 +451,7 @@ const PAGE_HTML = `
 <section>
   <div class="wrap">
     <div class="section-head center" data-reveal>
-      <h2>Plus de 20 entreprises d'aménagement et de rénovation au Maroc ont déjà <span class="gradient-text">augmenté leur chiffre d'affaires mensuel</span> grâce à notre accompagnement.</h2>
-      <p>Voici la progression type que traverse une entreprise accompagnée par ReachFlow, palier par palier :</p>
+      <h2>Vos 90 premiers jours avec <span class="gradient-text">ReachFlow</span></h2>
     </div>
     <div class="growth-path" data-reveal>
       <div class="growth-steps">
@@ -407,19 +459,19 @@ const PAGE_HTML = `
         <div class="growth-line-fill"></div>
         <div class="growth-step">
           <div class="growth-badge">01</div>
-          <div class="growth-copy"><strong>Point de départ</strong><span>Chantiers irréguliers, dépendants du bouche-à-oreille</span></div>
+          <div class="growth-copy"><strong>J1–7</strong><span>Installation du système : publicités, formulaire, qualification WhatsApp</span></div>
         </div>
         <div class="growth-step">
           <div class="growth-badge">02</div>
-          <div class="growth-copy"><strong>500 000 MAD</strong><span>/ mois — Flux de chantiers stable toute l'année</span></div>
+          <div class="growth-copy"><strong>J14–21</strong><span>Vos premiers rendez-vous qualifiés arrivent</span></div>
         </div>
         <div class="growth-step">
           <div class="growth-badge">03</div>
-          <div class="growth-copy"><strong>1 500 000 MAD</strong><span>/ mois — Votre équipe commerciale prend le relais</span></div>
+          <div class="growth-copy"><strong>J30</strong><span>Relance automatique de vos devis en attente</span></div>
         </div>
         <div class="growth-step">
           <div class="growth-badge">🚀</div>
-          <div class="growth-copy"><strong>3 000 000+ MAD</strong><span>/ mois — Expansion à plusieurs villes</span></div>
+          <div class="growth-copy"><strong>J90</strong><span>Un flux de chantiers stable, que vous pilotez</span></div>
         </div>
       </div>
     </div>
@@ -430,7 +482,7 @@ const PAGE_HTML = `
   <div class="wrap approach-grid">
     <div data-reveal>
       <h2>Notre approche est <span class="gradient-text">100&nbsp;% sur mesure</span>.</h2>
-      <p style="margin-bottom:16px;">Nous ne sommes pas une agence de leads comme les autres : on construit avec vous une croissance durable, <span class="hl">de l'acquisition jusqu'à la structuration de votre équipe</span>.</p>
+      <p style="margin-bottom:16px;">On construit avec vous une croissance durable, <span class="hl">de l'acquisition jusqu'à la structuration de votre équipe</span>.</p>
       <p>Que votre objectif soit de :</p>
       <ul class="check-list">
         <li><span class="check-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg></span><span>Remplir votre carnet de chantiers toute l'année, <span class="hl">sans creux</span></span></li>
@@ -447,6 +499,19 @@ const PAGE_HTML = `
         <div class="objective-item"><span class="niche-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.4-7-11.5A7 7 0 0 1 19 9.5C19 14.6 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.3"/></svg></span><span>Nouvelles villes</span></div>
         <div class="objective-item"><span class="niche-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 20c0-3.5 2.9-6 6.5-6s6.5 2.5 6.5 6"/><circle cx="17.5" cy="8.5" r="2.4"/><path d="M15.8 14.2c2.7.4 4.7 2.4 4.7 5.3"/></svg></span><span>Votre équipe commerciale</span></div>
       </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="guarantee-block" data-reveal>
+      <h2>Notre <span class="gradient-text">garantie</span></h2>
+      <p>[TEXTE DE LA GARANTIE À CONFIRMER PAR ACHRAF]</p>
+      <span class="scarcity-badge">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M13 2L3 14h8l-1 8 11-14h-8z"/></svg>
+        5 places au tarif fondateur — ouvertes uniquement pour le lancement
+      </span>
     </div>
   </div>
 </section>
@@ -478,7 +543,17 @@ const PAGE_HTML = `
                 <label class="check-opt"><input type="checkbox" name="type" value="amenagement"> Aménagement intérieur clé-en-main</label>
                 <label class="check-opt"><input type="checkbox" name="type" value="cuisine-sdb"> Cuisine &amp; salle de bain</label>
                 <label class="check-opt"><input type="checkbox" name="type" value="tertiaire"> Bureaux &amp; locaux commerciaux</label>
+                <label class="check-opt"><input type="checkbox" name="type" value="menuiserie"> Menuiserie</label>
                 <label class="check-opt"><input type="checkbox" name="type" value="autres"> Autres</label>
+              </div>
+            </div>
+            <div class="field">
+              <label>Valeur moyenne d'un chantier ? *</label>
+              <div class="check-grid">
+                <label class="check-opt"><input type="radio" name="valeur_chantier" value="moins-50k"> Moins de 50 000 MAD</label>
+                <label class="check-opt"><input type="radio" name="valeur_chantier" value="50k-150k"> 50 000 – 150 000 MAD</label>
+                <label class="check-opt"><input type="radio" name="valeur_chantier" value="150k-500k"> 150 000 – 500 000 MAD</label>
+                <label class="check-opt"><input type="radio" name="valeur_chantier" value="plus-500k"> Plus de 500 000 MAD</label>
               </div>
             </div>
             <button type="button" class="btn btn-block" id="formNextBtn">Continuer</button>
@@ -500,7 +575,7 @@ const PAGE_HTML = `
             </div>
             <button type="button" class="btn-back" id="formBackBtn">&larr; Retour</button>
             <button type="submit" class="btn btn-block" id="leadSubmitBtn">Voir si mon entreprise est éligible</button>
-            <p class="form-note"><span class="hl-soft">Aucun paiement</span> ne vous sera demandé sans accord mutuel préalable.</p>
+            <p class="form-note"><span class="hl-soft">Diagnostic de 30 min, offert.</span> Si on ne voit pas comment vous apporter plus de chantiers, on vous le dit franchement — et on s'arrête là.</p>
           </div>
         </form>
       </div>
@@ -580,7 +655,7 @@ const PAGE_HTML = `
     <a href="#form" class="btn">Découvrez si votre entreprise est éligible</a>
     <div class="micro-risk" style="justify-content:center; margin-top:14px;">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>
-      <span><span class="hl-soft">Aucun paiement</span> ne vous sera demandé sans accord mutuel préalable.</span>
+      <span><span class="hl-soft">Diagnostic de 30 min, offert.</span> Si on ne voit pas comment vous apporter plus de chantiers, on vous le dit franchement — et on s'arrête là.</span>
     </div>
   </div>
 </section>
@@ -594,7 +669,7 @@ const PAGE_HTML = `
 </footer>
 
 <div class="sticky-cta" id="stickyCta">
-  <span class="sticky-cta-label">Diagnostic gratuit · Sans engagement</span>
+  <span class="sticky-cta-label">Diagnostic offert · Réponse franche garantie</span>
   <a href="#form" class="btn btn-block">Voir si mon entreprise est éligible</a>
 </div>
 `;
@@ -684,6 +759,7 @@ export default function AmenagementPage() {
     const onNext = () => {
       const company = form?.querySelector<HTMLInputElement>("#company");
       const checks = form?.querySelectorAll<HTMLInputElement>('input[name="type"]:checked') ?? [];
+      const valeurChecked = form?.querySelector<HTMLInputElement>('input[name="valeur_chantier"]:checked');
       if (!company?.value.trim()) {
         alert("Merci d'indiquer le nom de votre entreprise.");
         company?.focus();
@@ -693,18 +769,41 @@ export default function AmenagementPage() {
         alert("Merci de sélectionner au moins un type de projet.");
         return;
       }
+      if (!valeurChecked) {
+        alert("Merci d'indiquer la valeur moyenne d'un chantier.");
+        return;
+      }
       goToStep(2);
     };
     nextBtn?.addEventListener("click", onNext);
     backBtn?.addEventListener("click", () => goToStep(1));
 
+    const nicheTagButtons = root.querySelectorAll<HTMLButtonElement>(".niche-tag");
+    const onNicheTagClick = (btn: HTMLButtonElement) => {
+      const value = btn.dataset.projectType;
+      const targetCheckbox = form?.querySelector<HTMLInputElement>(`input[name="type"][value="${value}"]`);
+      if (targetCheckbox && !targetCheckbox.checked) {
+        targetCheckbox.checked = true;
+        targetCheckbox.dispatchEvent(new Event("change", { bubbles: true }));
+      }
+      nicheTagButtons.forEach((b) => b.classList.toggle("is-selected", b === btn));
+      document.querySelector("#form")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    };
+    nicheTagButtons.forEach((btn) => btn.addEventListener("click", () => onNicheTagClick(btn)));
+
     const onSubmit = async (e: Event) => {
       e.preventDefault();
       if (!form) return;
       const checks = form.querySelectorAll<HTMLInputElement>('input[name="type"]:checked');
+      const valeurChantier = form.querySelector<HTMLInputElement>('input[name="valeur_chantier"]:checked')?.value || "";
       if (checks.length === 0) {
         goToStep(1);
         alert("Merci de sélectionner au moins un type de projet.");
+        return;
+      }
+      if (!valeurChantier) {
+        goToStep(1);
+        alert("Merci d'indiquer la valeur moyenne d'un chantier.");
         return;
       }
       const fullname = (form.querySelector<HTMLInputElement>("#fullname")?.value || "").trim();
@@ -731,6 +830,7 @@ export default function AmenagementPage() {
         email,
         entreprise: company,
         typesDeProjets: projectTypes.join(", "),
+        valeur_chantier: valeurChantier,
         source: "amenagement",
         datetime,
       };
