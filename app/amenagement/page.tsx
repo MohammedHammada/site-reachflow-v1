@@ -104,6 +104,7 @@ const PAGE_STYLES = `
   #rf-lp .hero-content{ max-width:680px; margin:0 auto; }
   #rf-lp .hero-roadmap{ max-width:560px; margin:32px auto 32px; }
   @media (max-width:720px){ #rf-lp .hero-roadmap{ margin:26px auto 26px; } }
+  #rf-lp .hero-eyebrow{display:block; text-align:center; font-weight:600; color:var(--accent); font-size:0.9rem; margin-bottom:14px; letter-spacing:0.01em;}
   #rf-lp .hero h1{margin-bottom:22px;}
   #rf-lp .hero .lede{font-size:1.14rem; max-width:46ch; margin:0 auto 24px; color:var(--text-muted);}
 
@@ -191,6 +192,12 @@ const PAGE_STYLES = `
   #rf-lp .guarantee-block h2{margin-bottom:16px;}
   #rf-lp .guarantee-block p{max-width:620px; margin:0 auto; font-size:1.05rem;}
   #rf-lp .scarcity-badge{display:inline-flex; align-items:center; gap:8px; margin-top:24px; padding:11px 22px; border-radius:var(--radius-pill); background:color-mix(in srgb, var(--accent-2) 16%, var(--bg)); border:1px solid color-mix(in srgb, var(--accent-2) 40%, var(--border)); color:var(--accent-2); font-weight:700; font-size:0.88rem;}
+  #rf-lp .guarantee-conditions{text-align:left; max-width:560px; margin:28px auto 0; padding:24px; background:var(--bg); border:1px solid var(--border); border-radius:var(--radius-m);}
+  #rf-lp .guarantee-conditions-title{font-size:0.88rem; font-weight:700; color:var(--text); margin-bottom:14px; display:block;}
+  #rf-lp .guarantee-conditions ul{list-style:none; display:flex; flex-direction:column; gap:10px; margin:0;}
+  #rf-lp .guarantee-conditions li{display:flex; gap:10px; align-items:flex-start; font-size:0.9rem; color:var(--text-muted); line-height:1.5;}
+  #rf-lp .guarantee-conditions li::before{content:"—"; flex-shrink:0; color:var(--accent);}
+  #rf-lp .guarantee-note{font-size:0.82rem; color:var(--text-muted); max-width:560px; margin:16px auto 0; font-style:italic;}
 
   #rf-lp .approach-grid{display:grid; grid-template-columns:1fr 1fr; gap:64px; align-items:center;}
   @media (max-width:820px){ #rf-lp .approach-grid{grid-template-columns:1fr; gap:32px;} }
@@ -350,8 +357,9 @@ const PAGE_HTML = `
 
     <div class="hero-content">
       <div>
-        <h1>Entreprises d'aménagement et de rénovation : un <span class="gradient-text">carnet de chantiers plein</span> toute l'année, sans dépendre du bouche-à-oreille.</h1>
-        <p class="lede">On installe tout le système — <span class="hl">publicités</span>, <span class="hl">qualification WhatsApp</span>, <span class="hl">relance des devis</span>. Vous, vous ne faites que les visites de chantier.</p>
+        <span class="hero-eyebrow">Pour les entreprises d'aménagement et de rénovation au Maroc</span>
+        <h1>3 mois de chantiers réservés en 90 jours. <span class="gradient-text">Sinon, on continue gratuitement</span> jusqu'à ce que ce soit fait.</h1>
+        <p class="lede">On installe la <span class="hl">Machine à Chantiers</span> : publicités, qualification WhatsApp, relance de vos devis. Vous, vous ne faites que les visites.</p>
 
         <div class="niche-tags-label">Vous vous reconnaissez ?</div>
         <div class="niche-tags" id="nicheTags">
@@ -362,10 +370,10 @@ const PAGE_HTML = `
           <button type="button" class="niche-tag" data-project-type="menuiserie">Menuiserie</button>
         </div>
 
-        <a href="#form" class="btn">Découvrez si votre entreprise est éligible</a>
+        <a href="#form" class="btn">Voir si mon entreprise est éligible à la garantie</a>
         <div class="micro-risk">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>
-          <span><span class="hl-soft">Diagnostic de 30 min, offert.</span> Si on ne voit pas comment vous apporter plus de chantiers, on vous le dit franchement — et on s'arrête là.</span>
+          <span>Diagnostic de 30 min offert · 5 places ouvertes</span>
         </div>
 
         <div class="hero-roadmap">
@@ -406,7 +414,7 @@ const PAGE_HTML = `
 <section>
   <div class="wrap">
     <div class="steps-title" data-reveal>
-      <h2><span class="gradient-text">Les 6 étapes essentielles</span> du scaling, identifiées dans toutes les entreprises d'aménagement et de rénovation que nous avons accompagnées.</h2>
+      <h2><span class="gradient-text">Les 6 étapes</span> pour garder votre carnet plein, identifiées dans toutes les entreprises d'aménagement que nous avons accompagnées.</h2>
       <p>Et les raisons précises pour lesquelles votre entreprise est probablement bloquée à l'une de ces étapes — <span class="hl">dépendance au réseau</span>, <span class="hl">devis qui traînent</span>, ou <span class="hl">chantiers qui plafonnent</span> votre capacité.</p>
     </div>
   </div>
@@ -416,26 +424,26 @@ const PAGE_HTML = `
   <div class="wrap">
     <div class="section-head center" data-reveal>
       <span class="eyebrow-num">Comment ça marche</span>
-      <h2>Un process en <span class="gradient-text">3 temps</span>, sans engagement de votre part.</h2>
+      <h2>De votre premier appel à un <span class="gradient-text">carnet rempli pour 3 mois</span>.</h2>
     </div>
     <div class="how-grid">
       <div class="how-card" data-reveal>
         <div class="how-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></div>
         <div class="how-num">ÉTAPE 01</div>
-        <h3>Diagnostic gratuit</h3>
-        <p>Nous réalisons une analyse experte de votre entreprise pour déterminer votre <span class="hl">position exacte</span> sur notre roadmap en 6 étapes.</p>
+        <h3>Diagnostic (30 min)</h3>
+        <p>On analyse votre entreprise et on fixe ensemble votre objectif : le <span class="hl">nombre exact de chantiers</span> qui représente 3 mois de travail pour votre équipe.</p>
       </div>
       <div class="how-card" data-reveal>
         <div class="how-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="0.5" fill="currentColor"/></svg></div>
         <div class="how-num">ÉTAPE 02</div>
-        <h3>Détection du blocage</h3>
-        <p>Nous identifions précisément ce qui freine votre croissance : <span class="hl">acquisition de chantiers qualifiés</span>, <span class="hl">closing des devis</span>, organisation d'équipe, ou capacité de production.</p>
+        <h3>Installation (J1–7)</h3>
+        <p>On installe tout le système : <span class="hl">publicités ciblées</span>, formulaire de qualification, confirmation WhatsApp et relance automatique de vos devis.</p>
       </div>
       <div class="how-card" data-reveal>
         <div class="how-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 20l-6-2V4l6 2 6-2 6 2v14l-6-2-6 2z"/><path d="M9 6v14M15 4v14"/></svg></div>
         <div class="how-num">ÉTAPE 03</div>
-        <h3>Stratégie personnalisée</h3>
-        <p>Vous obtenez un <span class="hl">plan détaillé et sur-mesure</span>, adapté à votre réalité de terrain et à votre région — <span class="hl">sans engagement</span> de votre part.</p>
+        <h3>Vos chantiers arrivent (J14–90)</h3>
+        <p>Les <span class="hl">rendez-vous qualifiés</span> arrivent chaque semaine. Vous faites les visites, vous signez. On suit l'objectif avec vous jusqu'à ce qu'il soit atteint.</p>
       </div>
     </div>
     <div class="cta-center">
@@ -471,7 +479,7 @@ const PAGE_HTML = `
         </div>
         <div class="growth-step">
           <div class="growth-badge">🚀</div>
-          <div class="growth-copy"><strong>J90</strong><span>Un flux de chantiers stable, que vous pilotez</span></div>
+          <div class="growth-copy"><strong>J90</strong><span>3 mois de chantiers dans votre carnet. Sinon, on continue gratuitement.</span></div>
         </div>
       </div>
     </div>
@@ -481,11 +489,10 @@ const PAGE_HTML = `
 <section>
   <div class="wrap approach-grid">
     <div data-reveal>
-      <h2>Notre approche est <span class="gradient-text">100&nbsp;% sur mesure</span>.</h2>
-      <p style="margin-bottom:16px;">On construit avec vous une croissance durable, <span class="hl">de l'acquisition jusqu'à la structuration de votre équipe</span>.</p>
-      <p>Que votre objectif soit de :</p>
+      <h2>Et une fois votre carnet <span class="gradient-text">plein</span> ?</h2>
+      <p style="margin-bottom:16px;">La garantie 90 jours, c'est le point de départ. Ensuite, on construit la suite avec vous, <span class="hl">de l'acquisition jusqu'à la structuration de votre équipe</span> :</p>
       <ul class="check-list">
-        <li><span class="check-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg></span><span>Remplir votre carnet de chantiers toute l'année, <span class="hl">sans creux</span></span></li>
+        <li><span class="check-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg></span><span>Garder un carnet plein toute l'année, <span class="hl">sans creux</span></span></li>
         <li><span class="check-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg></span><span>Augmenter la <span class="hl">valeur moyenne</span> de vos projets</span></li>
         <li><span class="check-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg></span><span>Vous étendre dans <span class="hl">d'autres villes</span></span></li>
         <li><span class="check-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg></span><span>Structurer <span class="hl">votre propre équipe commerciale</span></span></li>
@@ -506,11 +513,21 @@ const PAGE_HTML = `
 <section>
   <div class="wrap">
     <div class="guarantee-block" data-reveal>
-      <h2>Notre <span class="gradient-text">garantie</span></h2>
-      <p>[TEXTE DE LA GARANTIE À CONFIRMER PAR ACHRAF]</p>
+      <h2>La garantie <span class="gradient-text">Machine à Chantiers</span></h2>
+      <p>Si vous n'avez pas 3 mois de chantiers réservés au bout de 90 jours, on continue à travailler gratuitement jusqu'à ce que ce soit le cas. Vous ne payez plus nos honoraires tant que l'objectif n'est pas atteint.</p>
+      <div class="guarantee-conditions">
+        <span class="guarantee-conditions-title">Pour que la garantie s'applique, vous vous engagez à :</span>
+        <ul>
+          <li>Répondre aux nouveaux contacts en moins de 2 heures</li>
+          <li>Réaliser les visites de chantier programmées</li>
+          <li>Envoyer vos devis sous 48 heures après la visite</li>
+          <li>Maintenir un budget publicitaire d'au moins [X] MAD / mois (à votre charge)</li>
+        </ul>
+      </div>
+      <p class="guarantee-note">L'objectif en nombre de chantiers est fixé ensemble pendant le diagnostic, selon la capacité de votre équipe.</p>
       <span class="scarcity-badge">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M13 2L3 14h8l-1 8 11-14h-8z"/></svg>
-        5 places au tarif fondateur — ouvertes uniquement pour le lancement
+        5 places seulement — on ne peut garantir ce résultat qu'à 5 entreprises à la fois
       </span>
     </div>
   </div>
@@ -521,8 +538,8 @@ const PAGE_HTML = `
     <div class="form-wrap">
       <div data-reveal>
         <span class="eyebrow-num">Votre dossier</span>
-        <h2>Voyons si votre entreprise est <span class="gradient-text">éligible</span> à un diagnostic gratuit.</h2>
-        <p style="margin-top:16px;">Quelques informations pour préparer une analyse pertinente de votre situation — <span class="hl">pas de démarchage, pas d'engagement</span>.</p>
+        <h2>Voyons si votre entreprise est <span class="gradient-text">éligible</span> à la garantie 90 jours.</h2>
+        <p style="margin-top:16px;">Quelques questions pour vérifier qu'on peut vraiment remplir votre carnet — <span class="hl">pas de démarchage, pas d'engagement</span>.</p>
       </div>
 
       <div class="form-card" data-reveal>
@@ -554,6 +571,15 @@ const PAGE_HTML = `
                 <label class="check-opt"><input type="radio" name="valeur_chantier" value="50k-150k"> 50 000 – 150 000 MAD</label>
                 <label class="check-opt"><input type="radio" name="valeur_chantier" value="150k-500k"> 150 000 – 500 000 MAD</label>
                 <label class="check-opt"><input type="radio" name="valeur_chantier" value="plus-500k"> Plus de 500 000 MAD</label>
+              </div>
+            </div>
+            <div class="field">
+              <label>Combien de chantiers votre équipe peut-elle gérer en parallèle ? *</label>
+              <div class="check-grid">
+                <label class="check-opt"><input type="radio" name="capacite_chantiers" value="1-2"> 1 à 2</label>
+                <label class="check-opt"><input type="radio" name="capacite_chantiers" value="3-5"> 3 à 5</label>
+                <label class="check-opt"><input type="radio" name="capacite_chantiers" value="6-10"> 6 à 10</label>
+                <label class="check-opt"><input type="radio" name="capacite_chantiers" value="plus-10"> Plus de 10</label>
               </div>
             </div>
             <button type="button" class="btn btn-block" id="formNextBtn">Continuer</button>
@@ -651,11 +677,11 @@ const PAGE_HTML = `
 
 <section>
   <div class="wrap final-cta" data-reveal>
-    <h2>Prêt à savoir où se situe votre entreprise sur <span class="gradient-text">la roadmap</span> ?</h2>
-    <a href="#form" class="btn">Découvrez si votre entreprise est éligible</a>
+    <h2>Prêt à remplir votre carnet pour les <span class="gradient-text">3 prochains mois</span> ?</h2>
+    <a href="#form" class="btn">Voir si mon entreprise est éligible à la garantie</a>
     <div class="micro-risk" style="justify-content:center; margin-top:14px;">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>
-      <span><span class="hl-soft">Diagnostic de 30 min, offert.</span> Si on ne voit pas comment vous apporter plus de chantiers, on vous le dit franchement — et on s'arrête là.</span>
+      <span>Diagnostic de 30 min offert · 5 places ouvertes</span>
     </div>
   </div>
 </section>
@@ -669,8 +695,8 @@ const PAGE_HTML = `
 </footer>
 
 <div class="sticky-cta" id="stickyCta">
-  <span class="sticky-cta-label">Diagnostic offert · Réponse franche garantie</span>
-  <a href="#form" class="btn btn-block">Voir si mon entreprise est éligible</a>
+  <span class="sticky-cta-label">Garantie 90 jours · 5 places</span>
+  <a href="#form" class="btn btn-block">Voir si je suis éligible</a>
 </div>
 `;
 
@@ -760,6 +786,7 @@ export default function AmenagementPage() {
       const company = form?.querySelector<HTMLInputElement>("#company");
       const checks = form?.querySelectorAll<HTMLInputElement>('input[name="type"]:checked') ?? [];
       const valeurChecked = form?.querySelector<HTMLInputElement>('input[name="valeur_chantier"]:checked');
+      const capaciteChecked = form?.querySelector<HTMLInputElement>('input[name="capacite_chantiers"]:checked');
       if (!company?.value.trim()) {
         alert("Merci d'indiquer le nom de votre entreprise.");
         company?.focus();
@@ -771,6 +798,10 @@ export default function AmenagementPage() {
       }
       if (!valeurChecked) {
         alert("Merci d'indiquer la valeur moyenne d'un chantier.");
+        return;
+      }
+      if (!capaciteChecked) {
+        alert("Merci d'indiquer combien de chantiers votre équipe peut gérer en parallèle.");
         return;
       }
       goToStep(2);
@@ -796,6 +827,7 @@ export default function AmenagementPage() {
       if (!form) return;
       const checks = form.querySelectorAll<HTMLInputElement>('input[name="type"]:checked');
       const valeurChantier = form.querySelector<HTMLInputElement>('input[name="valeur_chantier"]:checked')?.value || "";
+      const capaciteChantiers = form.querySelector<HTMLInputElement>('input[name="capacite_chantiers"]:checked')?.value || "";
       if (checks.length === 0) {
         goToStep(1);
         alert("Merci de sélectionner au moins un type de projet.");
@@ -804,6 +836,11 @@ export default function AmenagementPage() {
       if (!valeurChantier) {
         goToStep(1);
         alert("Merci d'indiquer la valeur moyenne d'un chantier.");
+        return;
+      }
+      if (!capaciteChantiers) {
+        goToStep(1);
+        alert("Merci d'indiquer combien de chantiers votre équipe peut gérer en parallèle.");
         return;
       }
       const fullname = (form.querySelector<HTMLInputElement>("#fullname")?.value || "").trim();
@@ -831,6 +868,7 @@ export default function AmenagementPage() {
         entreprise: company,
         typesDeProjets: projectTypes.join(", "),
         valeur_chantier: valeurChantier,
+        capacite_chantiers: capaciteChantiers,
         source: "amenagement",
         datetime,
       };
