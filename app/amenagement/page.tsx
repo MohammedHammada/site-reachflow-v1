@@ -187,18 +187,6 @@ const PAGE_STYLES = `
   #rf-lp .pain-icon{width:40px; height:40px; border-radius:12px; background:color-mix(in srgb, var(--accent-2) 16%, var(--bg-elevated)); color:var(--accent-2); display:flex; align-items:center; justify-content:center; margin-bottom:16px;}
   #rf-lp .pain-closing{text-align:center; font-size:1.15rem; font-weight:700; color:var(--text); max-width:620px; margin:0 auto;}
 
-  #rf-lp .guarantee-block{background:var(--bg-elevated); border:1px solid var(--border); border-radius:var(--radius-l); padding:52px 40px; text-align:center; box-shadow:var(--shadow-m);}
-  @media (max-width:640px){ #rf-lp .guarantee-block{padding:36px 22px;} }
-  #rf-lp .guarantee-block h2{margin-bottom:16px;}
-  #rf-lp .guarantee-block p{max-width:620px; margin:0 auto; font-size:1.05rem;}
-  #rf-lp .scarcity-badge{display:inline-flex; align-items:center; gap:8px; margin-top:24px; padding:11px 22px; border-radius:var(--radius-pill); background:color-mix(in srgb, var(--accent-2) 16%, var(--bg)); border:1px solid color-mix(in srgb, var(--accent-2) 40%, var(--border)); color:var(--accent-2); font-weight:700; font-size:0.88rem;}
-  #rf-lp .guarantee-conditions{text-align:left; max-width:560px; margin:28px auto 0; padding:24px; background:var(--bg); border:1px solid var(--border); border-radius:var(--radius-m);}
-  #rf-lp .guarantee-conditions-title{font-size:0.88rem; font-weight:700; color:var(--text); margin-bottom:14px; display:block;}
-  #rf-lp .guarantee-conditions ul{list-style:none; display:flex; flex-direction:column; gap:10px; margin:0;}
-  #rf-lp .guarantee-conditions li{display:flex; gap:10px; align-items:flex-start; font-size:0.9rem; color:var(--text-muted); line-height:1.5;}
-  #rf-lp .guarantee-conditions li::before{content:"—"; flex-shrink:0; color:var(--accent);}
-  #rf-lp .guarantee-note{font-size:0.82rem; color:var(--text-muted); max-width:560px; margin:16px auto 0; font-style:italic;}
-
   #rf-lp .approach-grid{display:grid; grid-template-columns:1fr 1fr; gap:64px; align-items:center;}
   @media (max-width:820px){ #rf-lp .approach-grid{grid-template-columns:1fr; gap:32px;} }
   #rf-lp .objective-card{ padding:28px; }
@@ -506,29 +494,6 @@ const PAGE_HTML = `
         <div class="objective-item"><span class="niche-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.4-7-11.5A7 7 0 0 1 19 9.5C19 14.6 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.3"/></svg></span><span>Nouvelles villes</span></div>
         <div class="objective-item"><span class="niche-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 20c0-3.5 2.9-6 6.5-6s6.5 2.5 6.5 6"/><circle cx="17.5" cy="8.5" r="2.4"/><path d="M15.8 14.2c2.7.4 4.7 2.4 4.7 5.3"/></svg></span><span>Votre équipe commerciale</span></div>
       </div>
-    </div>
-  </div>
-</section>
-
-<section>
-  <div class="wrap">
-    <div class="guarantee-block" data-reveal>
-      <h2>La garantie <span class="gradient-text">Machine à Chantiers</span></h2>
-      <p>Si vous n'avez pas 3 mois de chantiers réservés au bout de 90 jours, on continue à travailler gratuitement jusqu'à ce que ce soit le cas. Vous ne payez plus nos honoraires tant que l'objectif n'est pas atteint.</p>
-      <div class="guarantee-conditions">
-        <span class="guarantee-conditions-title">Pour que la garantie s'applique, vous vous engagez à :</span>
-        <ul>
-          <li>Répondre aux nouveaux contacts en moins de 2 heures</li>
-          <li>Réaliser les visites de chantier programmées</li>
-          <li>Envoyer vos devis sous 48 heures après la visite</li>
-          <li>Maintenir un budget publicitaire d'au moins [X] MAD / mois (à votre charge)</li>
-        </ul>
-      </div>
-      <p class="guarantee-note">L'objectif en nombre de chantiers est fixé ensemble pendant le diagnostic, selon la capacité de votre équipe.</p>
-      <span class="scarcity-badge">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M13 2L3 14h8l-1 8 11-14h-8z"/></svg>
-        5 places seulement — on ne peut garantir ce résultat qu'à 5 entreprises à la fois
-      </span>
     </div>
   </div>
 </section>
