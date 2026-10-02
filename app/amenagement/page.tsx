@@ -494,7 +494,7 @@ const PAGE_HTML = `
       <div class="form-card" data-reveal>
         <div class="form-progress">
           <div class="form-progress-bar"><div class="form-progress-fill" id="formProgressFill"></div></div>
-          <span class="form-progress-label" id="formProgressLabel">Étape 1 sur 5</span>
+          <span class="form-progress-label" id="formProgressLabel">Étape 1 sur 6</span>
         </div>
         <form id="leadForm">
           <div class="form-step is-active" data-step="1">
@@ -550,6 +550,21 @@ const PAGE_HTML = `
           </div>
 
           <div class="form-step" data-step="5">
+            <div class="field">
+              <label>Quel budget publicitaire mensuel envisagez-vous pour remplir votre calendrier ? *</label>
+              <div class="check-grid">
+                <label class="check-opt"><input type="radio" name="budget_investissement" value="moins-5k"> Moins de 5 000 MAD</label>
+                <label class="check-opt"><input type="radio" name="budget_investissement" value="5k-15k"> 5 000 – 15 000 MAD</label>
+                <label class="check-opt"><input type="radio" name="budget_investissement" value="15k-30k"> 15 000 – 30 000 MAD</label>
+                <label class="check-opt"><input type="radio" name="budget_investissement" value="plus-30k"> Plus de 30 000 MAD</label>
+                <label class="check-opt"><input type="radio" name="budget_investissement" value="a-discuter"> À discuter pendant l'appel</label>
+              </div>
+            </div>
+            <button type="button" class="btn-back step-back">&larr; Retour</button>
+            <button type="button" class="btn btn-block step-next">Continuer</button>
+          </div>
+
+          <div class="form-step" data-step="6">
             <div class="field">
               <label for="fullname">Nom complet *</label>
               <input type="text" id="fullname" required>
@@ -723,7 +738,7 @@ export default function AmenagementPage() {
     const progressLabel = root.querySelector<HTMLElement>("#formProgressLabel");
     let currentStep = 1;
 
-    const focusTargets: Record<number, string> = { 1: "#company", 5: "#fullname" };
+    const focusTargets: Record<number, string> = { 1: "#company", 6: "#fullname" };
     const goToStep = (n: number) => {
       currentStep = n;
       steps.forEach((step) => step.classList.toggle("is-active", Number(step.dataset.step) === n));
@@ -760,6 +775,13 @@ export default function AmenagementPage() {
         const capaciteChecked = form?.querySelector<HTMLInputElement>('input[name="capacite_chantiers"]:checked');
         if (!capaciteChecked) {
           alert("Merci d'indiquer combien de chantiers votre équipe peut gérer en parallèle.");
+          return false;
+        }
+      }
+      if (n === 5) {
+        const budgetChecked = form?.querySelector<HTMLInputElement>('input[name="budget_investissement"]:checked');
+        if (!budgetChecked) {
+          alert("Merci d'indiquer le budget envisagé.");
           return false;
         }
       }
@@ -803,6 +825,7 @@ export default function AmenagementPage() {
       const checks = form.querySelectorAll<HTMLInputElement>('input[name="type"]:checked');
       const valeurChantier = form.querySelector<HTMLInputElement>('input[name="valeur_chantier"]:checked')?.value || "";
       const capaciteChantiers = form.querySelector<HTMLInputElement>('input[name="capacite_chantiers"]:checked')?.value || "";
+      const budgetInvestissement = form.querySelector<HTMLInputElement>('input[name="budget_investissement"]:checked')?.value || "";
       if (checks.length === 0) {
         goToStep(2);
         alert("Merci de sélectionner au moins un type de projet.");
@@ -816,6 +839,11 @@ export default function AmenagementPage() {
       if (!capaciteChantiers) {
         goToStep(4);
         alert("Merci d'indiquer combien de chantiers votre équipe peut gérer en parallèle.");
+        return;
+      }
+      if (!budgetInvestissement) {
+        goToStep(5);
+        alert("Merci d'indiquer le budget envisagé.");
         return;
       }
       const fullname = (form.querySelector<HTMLInputElement>("#fullname")?.value || "").trim();
@@ -844,6 +872,7 @@ export default function AmenagementPage() {
         typesDeProjets: projectTypes.join(", "),
         valeur_chantier: valeurChantier,
         capacite_chantiers: capaciteChantiers,
+        budget_investissement: budgetInvestissement,
         source: "amenagement",
         datetime,
       };
