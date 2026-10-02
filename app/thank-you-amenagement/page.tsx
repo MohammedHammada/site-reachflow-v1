@@ -133,8 +133,8 @@ const PAGE_HTML = `
         <div class="step-num">1</div>
         <div class="step-body">
           <h2>Confirmation WhatsApp <span style="font-weight:500; color:var(--text-muted); font-size:0.7em;">(action immédiate)</span></h2>
-          <p data-reveal>Cliquez sur le bouton ci-dessous pour <strong>confirmer vos données sur WhatsApp</strong>. Un de nos experts vous contactera très prochainement pour convenir du meilleur moment pour votre appel découverte de 5 minutes.</p>
-          <a href="https://wa.me/212663291741?text=Bonjour%2C%20je%20confirme%20mes%20donn%C3%A9es%20%E2%9C%85%20J%27attends%20votre%20message%20pour%20convenir%20du%20meilleur%20moment%20pour%20l%27appel%20d%C3%A9couverte%20de%205%20minutes." class="btn btn-whatsapp btn-block" data-reveal>
+          <p data-reveal>Cliquez sur le bouton ci-dessous pour <strong>confirmer vos données sur WhatsApp</strong>. Un de nos experts vous contactera très prochainement pour convenir du meilleur moment pour votre appel de 30 minutes.</p>
+          <a href="https://wa.me/212663291741?text=Bonjour%2C%20je%20confirme%20mes%20donn%C3%A9es%20%E2%9C%85%20J%27attends%20votre%20message%20pour%20convenir%20du%20meilleur%20moment%20pour%20l%27appel%20de%2030%20minutes." class="btn btn-whatsapp btn-block" data-reveal>
             <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.9 9.9 0 0 0 4.74 1.21h.01c5.46 0 9.91-4.45 9.91-9.91C21.96 6.45 17.5 2 12.04 2zm5.8 14.09c-.24.68-1.4 1.3-1.93 1.38-.5.08-1.11.11-1.79-.11-.41-.13-.95-.31-1.63-.6-2.87-1.24-4.74-4.14-4.89-4.33-.14-.19-1.17-1.56-1.17-2.98 0-1.41.74-2.11 1-2.4.26-.29.57-.36.76-.36.19 0 .38 0 .55.01.18.01.41-.07.64.49.24.58.81 2 .88 2.14.07.15.12.32.02.51-.09.19-.14.31-.28.48-.14.17-.29.37-.42.5-.14.14-.28.29-.12.57.16.28.71 1.17 1.52 1.9 1.05.94 1.93 1.23 2.21 1.37.28.14.44.12.61-.07.16-.19.68-.79.87-1.07.18-.28.37-.23.62-.14.26.09 1.64.77 1.92.91.28.14.47.21.53.33.07.12.07.7-.17 1.38z"/></svg>
             Je confirme
           </a>
@@ -151,8 +151,8 @@ const PAGE_HTML = `
       <div class="step">
         <div class="step-num">2</div>
         <div class="step-body">
-          <h2>L'appel d'introduction de 5 minutes</h2>
-          <p data-reveal>Une fois votre numéro confirmé, l'un de nos experts vous contactera très prochainement pour un bref échange de 5 minutes maximum.</p>
+          <h2>L'appel de 30 minutes</h2>
+          <p data-reveal>Une fois votre numéro confirmé, l'un de nos experts vous contactera très prochainement pour planifier votre appel de 30 minutes.</p>
         </div>
       </div>
     </div>
