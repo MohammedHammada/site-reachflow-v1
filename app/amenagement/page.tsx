@@ -31,9 +31,10 @@ const PAGE_STYLES = `
   #rf-lp{
     background:var(--bg); color:var(--text); font-family:var(--font);
     line-height:1.5; -webkit-font-smoothing:antialiased; font-size:17px;
-    position:relative; overflow-x:clip;
+    position:relative; overflow-x:clip; cursor:auto;
   }
   #rf-lp *{box-sizing:border-box;}
+  body:has(#rf-lp){ cursor:auto; }
   #rf-lp .bg-glow{ position:fixed; z-index:0; border-radius:50%; filter:blur(90px); pointer-events:none; }
   #rf-lp .bg-glow-1{ top:-180px; right:-160px; width:460px; height:460px; background:radial-gradient(circle, color-mix(in srgb, var(--accent) 30%, transparent) 0%, transparent 70%); }
   #rf-lp .bg-glow-2{ top:420px; left:-200px; width:420px; height:420px; background:radial-gradient(circle, color-mix(in srgb, var(--accent-2) 20%, transparent) 0%, transparent 70%); }
