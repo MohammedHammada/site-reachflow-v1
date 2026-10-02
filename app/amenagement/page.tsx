@@ -510,14 +510,18 @@ const PAGE_HTML = `
       <div class="form-card" data-reveal>
         <div class="form-progress">
           <div class="form-progress-bar"><div class="form-progress-fill" id="formProgressFill"></div></div>
-          <span class="form-progress-label" id="formProgressLabel">Étape 1 sur 2</span>
+          <span class="form-progress-label" id="formProgressLabel">Étape 1 sur 5</span>
         </div>
         <form id="leadForm">
-          <div class="form-step is-active" id="formStep1">
+          <div class="form-step is-active" data-step="1">
             <div class="field">
               <label for="company">Nom de l'entreprise *</label>
               <input type="text" id="company" required>
             </div>
+            <button type="button" class="btn btn-block step-next">Continuer</button>
+          </div>
+
+          <div class="form-step" data-step="2">
             <div class="field">
               <label>Quel type de projets réalisez-vous principalement ? *</label>
               <div class="check-grid">
@@ -529,6 +533,11 @@ const PAGE_HTML = `
                 <label class="check-opt"><input type="checkbox" name="type" value="autres"> Autres</label>
               </div>
             </div>
+            <button type="button" class="btn-back step-back">&larr; Retour</button>
+            <button type="button" class="btn btn-block step-next">Continuer</button>
+          </div>
+
+          <div class="form-step" data-step="3">
             <div class="field">
               <label>Valeur moyenne d'un chantier ? *</label>
               <div class="check-grid">
@@ -538,6 +547,11 @@ const PAGE_HTML = `
                 <label class="check-opt"><input type="radio" name="valeur_chantier" value="plus-500k"> Plus de 500 000 MAD</label>
               </div>
             </div>
+            <button type="button" class="btn-back step-back">&larr; Retour</button>
+            <button type="button" class="btn btn-block step-next">Continuer</button>
+          </div>
+
+          <div class="form-step" data-step="4">
             <div class="field">
               <label>Combien de chantiers votre équipe peut-elle gérer en parallèle ? *</label>
               <div class="check-grid">
@@ -547,9 +561,11 @@ const PAGE_HTML = `
                 <label class="check-opt"><input type="radio" name="capacite_chantiers" value="plus-10"> Plus de 10</label>
               </div>
             </div>
-            <button type="button" class="btn btn-block" id="formNextBtn">Continuer</button>
+            <button type="button" class="btn-back step-back">&larr; Retour</button>
+            <button type="button" class="btn btn-block step-next">Continuer</button>
           </div>
-          <div class="form-step" id="formStep2">
+
+          <div class="form-step" data-step="5">
             <div class="field">
               <label for="fullname">Nom complet *</label>
               <input type="text" id="fullname" required>
@@ -564,7 +580,7 @@ const PAGE_HTML = `
               <label for="email">Email *</label>
               <input type="email" id="email" required>
             </div>
-            <button type="button" class="btn-back" id="formBackBtn">&larr; Retour</button>
+            <button type="button" class="btn-back step-back">&larr; Retour</button>
             <button type="submit" class="btn btn-block" id="leadSubmitBtn">Voir si mon entreprise est éligible</button>
             <p class="form-note"><span class="hl-soft">Diagnostic de 30 min, offert.</span> Si on ne voit pas comment vous apporter plus de chantiers, on vous le dit franchement — et on s'arrête là.</p>
           </div>
@@ -717,45 +733,72 @@ export default function AmenagementPage() {
 
     const form = root.querySelector<HTMLFormElement>("#leadForm");
     const submitBtn = root.querySelector<HTMLButtonElement>("#leadSubmitBtn");
-    const step1 = root.querySelector<HTMLElement>("#formStep1");
-    const step2 = root.querySelector<HTMLElement>("#formStep2");
-    const nextBtn = root.querySelector<HTMLButtonElement>("#formNextBtn");
-    const backBtn = root.querySelector<HTMLButtonElement>("#formBackBtn");
+    const steps = Array.from(root.querySelectorAll<HTMLElement>(".form-step"));
+    const totalSteps = steps.length;
     const progressFill = root.querySelector<HTMLElement>("#formProgressFill");
     const progressLabel = root.querySelector<HTMLElement>("#formProgressLabel");
-    const goToStep = (n: 1 | 2) => {
-      step1?.classList.toggle("is-active", n === 1);
-      step2?.classList.toggle("is-active", n === 2);
-      if (progressFill) progressFill.style.width = n === 1 ? "50%" : "100%";
-      if (progressLabel) progressLabel.textContent = n === 1 ? "Étape 1 sur 2" : "Étape 2 sur 2";
-      if (n === 2) form?.querySelector<HTMLInputElement>("#fullname")?.focus();
+    let currentStep = 1;
+
+    const focusTargets: Record<number, string> = { 1: "#company", 5: "#fullname" };
+    const goToStep = (n: number) => {
+      currentStep = n;
+      steps.forEach((step) => step.classList.toggle("is-active", Number(step.dataset.step) === n));
+      if (progressFill) progressFill.style.width = `${(n / totalSteps) * 100}%`;
+      if (progressLabel) progressLabel.textContent = `Étape ${n} sur ${totalSteps}`;
+      const target = focusTargets[n];
+      if (target) form?.querySelector<HTMLInputElement>(target)?.focus();
     };
-    const onNext = () => {
-      const company = form?.querySelector<HTMLInputElement>("#company");
-      const checks = form?.querySelectorAll<HTMLInputElement>('input[name="type"]:checked') ?? [];
-      const valeurChecked = form?.querySelector<HTMLInputElement>('input[name="valeur_chantier"]:checked');
-      const capaciteChecked = form?.querySelector<HTMLInputElement>('input[name="capacite_chantiers"]:checked');
-      if (!company?.value.trim()) {
-        alert("Merci d'indiquer le nom de votre entreprise.");
-        company?.focus();
-        return;
+
+    const validateStep = (n: number): boolean => {
+      if (n === 1) {
+        const company = form?.querySelector<HTMLInputElement>("#company");
+        if (!company?.value.trim()) {
+          alert("Merci d'indiquer le nom de votre entreprise.");
+          company?.focus();
+          return false;
+        }
       }
-      if (checks.length === 0) {
-        alert("Merci de sélectionner au moins un type de projet.");
-        return;
+      if (n === 2) {
+        const checks = form?.querySelectorAll<HTMLInputElement>('input[name="type"]:checked') ?? [];
+        if (checks.length === 0) {
+          alert("Merci de sélectionner au moins un type de projet.");
+          return false;
+        }
       }
-      if (!valeurChecked) {
-        alert("Merci d'indiquer la valeur moyenne d'un chantier.");
-        return;
+      if (n === 3) {
+        const valeurChecked = form?.querySelector<HTMLInputElement>('input[name="valeur_chantier"]:checked');
+        if (!valeurChecked) {
+          alert("Merci d'indiquer la valeur moyenne d'un chantier.");
+          return false;
+        }
       }
-      if (!capaciteChecked) {
-        alert("Merci d'indiquer combien de chantiers votre équipe peut gérer en parallèle.");
-        return;
+      if (n === 4) {
+        const capaciteChecked = form?.querySelector<HTMLInputElement>('input[name="capacite_chantiers"]:checked');
+        if (!capaciteChecked) {
+          alert("Merci d'indiquer combien de chantiers votre équipe peut gérer en parallèle.");
+          return false;
+        }
       }
-      goToStep(2);
+      return true;
     };
-    nextBtn?.addEventListener("click", onNext);
-    backBtn?.addEventListener("click", () => goToStep(1));
+
+    const onStepNext = (e: Event) => {
+      const btn = e.currentTarget as HTMLButtonElement;
+      const step = btn.closest<HTMLElement>(".form-step");
+      const n = Number(step?.dataset.step);
+      if (!validateStep(n)) return;
+      goToStep(n + 1);
+    };
+    const onStepBack = (e: Event) => {
+      const btn = e.currentTarget as HTMLButtonElement;
+      const step = btn.closest<HTMLElement>(".form-step");
+      const n = Number(step?.dataset.step);
+      goToStep(n - 1);
+    };
+    const nextBtns = Array.from(root.querySelectorAll<HTMLButtonElement>(".step-next"));
+    const backBtns = Array.from(root.querySelectorAll<HTMLButtonElement>(".step-back"));
+    nextBtns.forEach((btn) => btn.addEventListener("click", onStepNext));
+    backBtns.forEach((btn) => btn.addEventListener("click", onStepBack));
 
     const nicheTagButtons = root.querySelectorAll<HTMLButtonElement>(".niche-tag");
     const onNicheTagClick = (btn: HTMLButtonElement) => {
@@ -777,17 +820,17 @@ export default function AmenagementPage() {
       const valeurChantier = form.querySelector<HTMLInputElement>('input[name="valeur_chantier"]:checked')?.value || "";
       const capaciteChantiers = form.querySelector<HTMLInputElement>('input[name="capacite_chantiers"]:checked')?.value || "";
       if (checks.length === 0) {
-        goToStep(1);
+        goToStep(2);
         alert("Merci de sélectionner au moins un type de projet.");
         return;
       }
       if (!valeurChantier) {
-        goToStep(1);
+        goToStep(3);
         alert("Merci d'indiquer la valeur moyenne d'un chantier.");
         return;
       }
       if (!capaciteChantiers) {
-        goToStep(1);
+        goToStep(4);
         alert("Merci d'indiquer combien de chantiers votre équipe peut gérer en parallèle.");
         return;
       }
@@ -868,7 +911,8 @@ export default function AmenagementPage() {
       stickyIo1?.disconnect();
       stickyIo2?.disconnect();
       form?.removeEventListener("submit", onSubmit);
-      nextBtn?.removeEventListener("click", onNext);
+      nextBtns.forEach((btn) => btn.removeEventListener("click", onStepNext));
+      backBtns.forEach((btn) => btn.removeEventListener("click", onStepBack));
       phoneInputEl?.removeEventListener("input", onPhoneInput);
     };
   }, [router]);
