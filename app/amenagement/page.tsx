@@ -638,23 +638,6 @@ const PAGE_HTML = `
       <h2>Écoutez ce que <span class="gradient-text">nos partenaires</span> disent</h2>
     </div>
 
-    <div class="test-grid">
-      <div class="test-audio" data-reveal>
-        <div class="test-audio-top">
-          <div class="avatar avatar-1">EC</div>
-          <div><strong>Entreprise d'aménagement — Casablanca</strong><span class="badge">✓ Audio</span></div>
-        </div>
-        <div class="waveform"></div>
-      </div>
-      <div class="test-audio" data-reveal>
-        <div class="test-audio-top">
-          <div class="avatar avatar-2">SR</div>
-          <div><strong>Société de rénovation — Rabat</strong><span class="badge">✓ Audio</span></div>
-        </div>
-        <div class="waveform"></div>
-      </div>
-    </div>
-
     <div class="quote-grid">
       <div class="quote-card" data-reveal>
         <span class="stars">★★★★★</span>
