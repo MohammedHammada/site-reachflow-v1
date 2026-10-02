@@ -65,8 +65,8 @@ function doPost(e) {
     const leadId = data.lead_id || '';
 
     let targetRow = -1;
-    if (leadId) {
-      const ids = sheet.getRange(2, 2, Math.max(sheet.getLastRow() - 1, 0), 1).getValues();
+    if (leadId && sheet.getLastRow() > 1) {
+      const ids = sheet.getRange(2, 2, sheet.getLastRow() - 1, 1).getValues();
       for (let i = 0; i < ids.length; i++) {
         if (String(ids[i][0]) === String(leadId)) { targetRow = i + 2; break; }
       }
