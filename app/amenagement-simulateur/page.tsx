@@ -1,22 +1,19 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 
 // A/B variant of /amenagement: replaces the qualifying form with a
 // "chantiers perdus" calculator/simulator funnel. The original /amenagement
 // page is untouched (control). Same design system, same backend pattern
-// (/api/submit-lead), but its own dedicated Google Sheet since the fields
-// captured here (métier, devis/mois, simulation results, UTM, fbclid...)
-// don't match the /amenagement sheet schema at all.
+// (/api/submit-lead), but its own dedicated Simulateur tab (same sheet as
+// /amenagement) since the fields captured here (métier, devis/mois,
+// simulation results, UTM, fbclid...) don't match the /amenagement columns.
 //
-// NOTE ACHRAF: two things are still placeholders pending info from you:
-//  - BOOKING_URL (step 9, qualified branch) — give me your real booking
-//    calendar link (Calendly, etc.) and I'll embed it.
-//  - MIN_BUDGET_BUCKET — I assumed "qualified" requires budget_pub above
-//    the lowest bucket ("Moins de 3 000 MAD"). Tell me if you want the
-//    threshold higher.
-
-const BOOKING_URL = "PASTE_BOOKING_URL_HERE";
+// No disqualification: everyone who completes the form is routed to the
+// existing /thank-you-amenagement page, same as the /amenagement funnel.
+// Budget/decision-maker answers are still captured for the closer's
+// context, but never block anyone.
 
 const PAGE_STYLES = `
   :root{
@@ -233,11 +230,6 @@ const PAGE_STYLES = `
   #rf-lp .sim-leak-box strong{display:block; margin-bottom:6px; color:var(--accent-ink); font-size:1rem;}
   #rf-lp .sim-leak-box p{margin:0; font-size:0.92rem; color:var(--text);}
 
-  #rf-lp .sim-qualified-block, #rf-lp .sim-not-qualified-block{display:none; text-align:center;}
-  #rf-lp .sim-qualified-block.active, #rf-lp .sim-not-qualified-block.active{display:block;}
-  #rf-lp .sim-booking-embed{border-radius:var(--radius-m); overflow:hidden; border:1px solid var(--border); min-height:640px; margin-top:20px; background:var(--bg);}
-  #rf-lp .sim-booking-embed iframe{width:100%; height:640px; border:none; display:block;}
-  #rf-lp .sim-booking-fallback{padding:40px 20px; text-align:center;}
 
   #rf-lp .proof-banner{ position:relative; background:var(--gradient-brand); border-radius:var(--radius-l); padding:56px 32px; text-align:center; box-shadow:0 20px 50px color-mix(in srgb, var(--accent) 35%, transparent); overflow:hidden; }
   #rf-lp .proof-banner::before{ content:""; position:absolute; inset:0; background:radial-gradient(circle at 20% 20%, rgba(255,255,255,0.25) 0%, transparent 45%); pointer-events:none; }
@@ -501,7 +493,7 @@ const PAGE_HTML = `
     <div class="form-card sim-card" data-reveal>
       <div class="form-progress">
         <div class="form-progress-bar"><div class="form-progress-fill" id="formProgressFill"></div></div>
-        <span class="form-progress-label" id="formProgressLabel">Étape 1 sur 9</span>
+        <span class="form-progress-label" id="formProgressLabel">Étape 1 sur 8</span>
       </div>
       <form id="simForm">
 
@@ -595,18 +587,6 @@ const PAGE_HTML = `
           <button type="button" class="sim-option-btn" data-field="decideur" data-value="non">Non</button>
           <button type="button" class="btn-back step-back">&larr; Retour</button>
           <button type="button" class="btn btn-block" id="simStep8Submit">Voir si je suis éligible</button>
-        </div>
-
-        <div class="form-step" data-step="9">
-          <div class="sim-qualified-block" id="simQualifiedBlock">
-            <h2 id="simQualifiedTitle">Bonne nouvelle : votre entreprise est éligible.</h2>
-            <p>Réservez votre session Plan Chantiers 90 jours. 45 minutes pour construire votre plan : sources de clients à activer, ce qui bloque vos signatures, objectif chiffré sur 90 jours.</p>
-            <div class="sim-booking-embed" id="simBookingEmbed"></div>
-          </div>
-          <div class="sim-not-qualified-block" id="simNotQualifiedBlock">
-            <h2 id="simNotQualifiedTitle">Merci. Votre demande est bien enregistrée.</h2>
-            <p>Notre équipe étudie votre situation et vous recontacte si nous pouvons vous aider.</p>
-          </div>
         </div>
 
       </form>
@@ -733,6 +713,7 @@ declare global {
 
 export default function AmenagementSimulateurPage() {
   const rootRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const root = rootRef.current;
@@ -821,7 +802,6 @@ export default function AmenagementSimulateurPage() {
       if (progressLabel) progressLabel.textContent = `Étape ${n} sur ${totalSteps}`;
       pushDataLayer({ event: "simulator_step", step: n });
       if (n === 6) renderResult();
-      if (n === 9) renderRouting();
       simForm?.scrollIntoView({ behavior: "smooth", block: "start" });
     };
 
@@ -1069,40 +1049,13 @@ export default function AmenagementSimulateurPage() {
       });
     });
 
-    const renderRouting = () => {
-      const firstName = data.nom.split(" ")[0] || "";
-      const qualifiedBlock = root.querySelector<HTMLElement>("#simQualifiedBlock");
-      const notQualifiedBlock = root.querySelector<HTMLElement>("#simNotQualifiedBlock");
-      const qualifiedTitle = root.querySelector<HTMLElement>("#simQualifiedTitle");
-      const notQualifiedTitle = root.querySelector<HTMLElement>("#simNotQualifiedTitle");
-      const bookingEmbed = root.querySelector<HTMLElement>("#simBookingEmbed");
-
-      if (qualifiedTitle) qualifiedTitle.textContent = `Bonne nouvelle${firstName ? ", " + firstName : ""} : votre entreprise est éligible.`;
-      if (notQualifiedTitle) notQualifiedTitle.textContent = `Merci${firstName ? ", " + firstName : ""}. Votre demande est bien enregistrée.`;
-
-      qualifiedBlock?.classList.toggle("active", data.qualifie);
-      notQualifiedBlock?.classList.toggle("active", !data.qualifie);
-
-      if (data.qualifie && bookingEmbed) {
-        if (BOOKING_URL && BOOKING_URL.startsWith("http")) {
-          bookingEmbed.innerHTML = `<iframe src="${BOOKING_URL}" title="Réserver votre session"></iframe>`;
-        } else {
-          bookingEmbed.innerHTML = `<div class="sim-booking-fallback"><p>Le lien de réservation n'est pas encore configuré — contactez-nous sur WhatsApp pour planifier votre session.</p></div>`;
-        }
-      }
-    };
-
     const step8SubmitBtn = root.querySelector<HTMLButtonElement>("#simStep8Submit");
     const onStep8Submit = async () => {
       if (!data.budget_pub) { alert("Merci d'indiquer le budget envisagé."); return; }
       if (!data.decideur) { alert("Merci d'indiquer si vous êtes décisionnaire."); return; }
 
-      const MIN_BUDGET_BUCKET = "moins-3k";
-      data.qualifie =
-        data.decideur !== "non" &&
-        data.budget_pub !== MIN_BUDGET_BUCKET &&
-        data.montant_moyen_label !== "" &&
-        data.montant_moyen_value > 15000;
+      // No disqualification: everyone who completes the form moves on.
+      data.qualifie = true;
 
       if (step8SubmitBtn) { step8SubmitBtn.disabled = true; step8SubmitBtn.textContent = "Envoi…"; }
       try {
@@ -1111,12 +1064,17 @@ export default function AmenagementSimulateurPage() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ ...buildPayload({ note: "Mise à jour qualification" }), isDisqualified: false }),
         });
-        if (data.qualifie) window.fbq?.("trackCustom", "QualifiedLead");
+        window.fbq?.("trackCustom", "QualifiedLead");
       } catch (err) {
         console.error(err);
       }
-      if (step8SubmitBtn) { step8SubmitBtn.disabled = false; step8SubmitBtn.textContent = "Voir si je suis éligible"; }
-      goToSimStep(9);
+      const params = new URLSearchParams({
+        nom: data.nom,
+        phone: data.whatsapp,
+        entreprise: data.entreprise,
+        types: data.metier,
+      });
+      router.push(`/thank-you-amenagement?${params.toString()}`);
     };
     step8SubmitBtn?.addEventListener("click", onStep8Submit);
 
@@ -1135,7 +1093,7 @@ export default function AmenagementSimulateurPage() {
       qualifButtons.forEach(({ btn, handler }) => btn.removeEventListener("click", handler));
       step8SubmitBtn?.removeEventListener("click", onStep8Submit);
     };
-  }, []);
+  }, [router]);
 
   return (
     <div id="rf-lp" ref={rootRef}>
