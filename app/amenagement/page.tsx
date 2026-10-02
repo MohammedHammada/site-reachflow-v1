@@ -358,8 +358,8 @@ const PAGE_HTML = `
     <div class="hero-content">
       <div>
         <span class="hero-eyebrow">Pour les entreprises d'aménagement et de rénovation au Maroc</span>
-        <h1>3 mois de chantiers réservés en 90 jours. <span class="gradient-text">Sinon, on continue gratuitement</span> jusqu'à ce que ce soit fait.</h1>
-        <p class="lede">On installe la <span class="hl">Machine à Chantiers</span> : publicités, qualification WhatsApp, relance de vos devis. Vous, vous ne faites que les visites.</p>
+        <h1>Votre carnet de chantiers plein pour les 3 prochains mois. <span class="gradient-text">Garanti.</span></h1>
+        <p class="lede">On remplit votre planning en 90 jours maximum — sinon, on continue gratuitement jusqu'à ce que ce soit fait. Vous, vous ne faites que les visites.</p>
 
         <div class="niche-tags-label">Vous vous reconnaissez ?</div>
         <div class="niche-tags" id="nicheTags">

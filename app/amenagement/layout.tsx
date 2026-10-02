@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: { absolute: "3 mois de chantiers en 90 jours — ReachFlow Aménagement" },
+  title: { absolute: "Votre carnet de chantiers plein pour 3 mois. Garanti. — ReachFlow" },
   description:
     "Garantie : 3 mois de chantiers réservés en 90 jours, ou on continue gratuitement. Diagnostic offert.",
   openGraph: {
-    title: "3 mois de chantiers en 90 jours — ReachFlow Aménagement",
+    title: "Votre carnet de chantiers plein pour 3 mois. Garanti. — ReachFlow",
     description:
       "Garantie : 3 mois de chantiers réservés en 90 jours, ou on continue gratuitement. Diagnostic offert.",
   },
   twitter: {
-    title: "3 mois de chantiers en 90 jours — ReachFlow Aménagement",
+    title: "Votre carnet de chantiers plein pour 3 mois. Garanti. — ReachFlow",
     description:
       "Garantie : 3 mois de chantiers réservés en 90 jours, ou on continue gratuitement. Diagnostic offert.",
   },
