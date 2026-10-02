@@ -1,7 +1,7 @@
 // ReachFlow - Leads Simulateur Aménagement Handler
 // Deploy: Extensions → Apps Script → Deploy → New deployment → Web app (Execute as: Me, Access: Anyone)
 
-const SHEET_ID = '1ae6vIJ7oScKZeqe9qfiE4coUfYyVQpfvtJuPTT1wEj8';
+const SHEET_ID = '1sWE3-NhNC3jKt1VTder0LgoRzDiZjPYCXB-NqS46YGo';
 const SHEET_NAME = 'Simulateur';
 
 const HEADERS = [
@@ -15,8 +15,9 @@ const HEADERS = [
 ];
 
 function getSheet_() {
-  let sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName(SHEET_NAME);
-  if (!sheet) sheet = SpreadsheetApp.openById(SHEET_ID).getSheets()[0];
+  const ss = SpreadsheetApp.openById(SHEET_ID);
+  let sheet = ss.getSheetByName(SHEET_NAME);
+  if (!sheet) sheet = ss.insertSheet(SHEET_NAME);
   if (sheet.getLastRow() === 0) sheet.appendRow(HEADERS);
   return sheet;
 }
