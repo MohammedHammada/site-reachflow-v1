@@ -6,6 +6,10 @@ const JUNK_URL =
   "https://script.google.com/macros/s/AKfycbx2ubYkSJMA_eH5uR0ewpcp5rcqP27MxLZvg6dLNVK2gPDeUDmEBi-bvlShY8gEQJ0u/exec";
 const AMENAGEMENT_URL =
   "https://script.google.com/macros/s/AKfycbyeG2nwuAwDoekcnSyT7DTh_4YgKr6tHTANCarywAW450lYlnmaWXsGt467v-R6FaGDmg/exec";
+// NOTE ACHRAF: placeholder until the SimulateurAmenagementCode.gs script is
+// deployed and you give me the real /exec URL — leads from the simulator
+// funnel will silently fail to reach a sheet until this is swapped.
+const SIMULATEUR_URL = "PASTE_SIMULATEUR_EXEC_URL_HERE";
 
 export async function POST(req: NextRequest) {
   try {
@@ -13,7 +17,9 @@ export async function POST(req: NextRequest) {
     const { isDisqualified, ...payload } = body;
 
     const source = String((payload as Record<string, unknown>).source || "");
-    const sheetUrl = source.startsWith("amenagement")
+    const sheetUrl = source === "amenagement-simulateur"
+      ? SIMULATEUR_URL
+      : source.startsWith("amenagement")
       ? AMENAGEMENT_URL
       : isDisqualified
       ? JUNK_URL
