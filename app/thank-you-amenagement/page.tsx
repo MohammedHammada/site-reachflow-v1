@@ -236,6 +236,11 @@ function ThankYouContent() {
   const typesFromLp = params.get("types")?.trim() || "";
 
   useEffect(() => {
+    const w = window as typeof window & { fbq?: (...args: unknown[]) => void };
+    w.fbq?.("track", "Lead");
+  }, []);
+
+  useEffect(() => {
     const root = rootRef.current;
     if (!root) return;
 
