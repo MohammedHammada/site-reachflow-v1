@@ -607,17 +607,17 @@ const PAGE_HTML = `
       <div class="quote-card" data-reveal>
         <span class="stars">★★★★★</span>
         <p>« Depuis qu'on travaille avec ReachFlow, on <span class="hl">ne dépend plus uniquement du bouche-à-oreille</span>. On a enfin une <span class="hl">vraie stratégie de croissance</span>, pas juste des contacts au compte-gouttes. »</p>
-        <div class="quote-who"><div class="avatar avatar-3" style="width:32px;height:32px;font-size:0.7rem;">NM</div><div><strong>Nom du client</strong><span>Entreprise d'aménagement intérieur, Marrakech</span></div></div>
+        <div class="quote-who"><div class="avatar avatar-3" style="width:32px;height:32px;font-size:0.7rem;">NM</div><div><span>Entreprise d'aménagement intérieur, Marrakech</span></div></div>
       </div>
       <div class="quote-card" data-reveal>
         <span class="stars">★★★★★</span>
         <p>« L'équipe est réactive et <span class="hl">comprend vraiment les contraintes du secteur</span>. Ce n'est pas juste des demandes, c'est un <span class="hl">vrai accompagnement</span>. »</p>
-        <div class="quote-who"><div class="avatar avatar-4" style="width:32px;height:32px;font-size:0.7rem;">HB</div><div><strong>Nom du client</strong><span>Société d'aménagement, Casablanca</span></div></div>
+        <div class="quote-who"><div class="avatar avatar-4" style="width:32px;height:32px;font-size:0.7rem;">HB</div><div><span>Société d'aménagement, Casablanca</span></div></div>
       </div>
       <div class="quote-card" data-reveal>
         <span class="stars">★★★★★</span>
         <p>« On a enfin une <span class="hl">visibilité claire sur notre pipeline</span> de chantiers au lieu de subir les creux d'activité. »</p>
-        <div class="quote-who"><div class="avatar avatar-5" style="width:32px;height:32px;font-size:0.7rem;">YT</div><div><strong>Nom du client</strong><span>Société de rénovation, Tanger</span></div></div>
+        <div class="quote-who"><div class="avatar avatar-5" style="width:32px;height:32px;font-size:0.7rem;">YT</div><div><span>Société de rénovation, Tanger</span></div></div>
       </div>
     </div>
   </div>
