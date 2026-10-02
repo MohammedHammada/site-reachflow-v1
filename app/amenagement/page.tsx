@@ -247,6 +247,7 @@ const PAGE_STYLES = `
   #rf-lp .results-item img{ display:block; width:100%; height:auto; }
 
   #rf-lp .avatar{width:44px; height:44px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-weight:700; color:#fff; font-size:0.85rem;}
+  #rf-lp .avatar svg{width:58%; height:58%; opacity:0.92;}
   #rf-lp .avatar-1{ background:linear-gradient(135deg, #FF6B29, #FF3D68); }
   #rf-lp .avatar-2{ background:linear-gradient(135deg, #FFB020, #FF6B29); }
   #rf-lp .avatar-3{ background:linear-gradient(135deg, #FF3D68, #B84E9E); }
@@ -324,11 +325,11 @@ const PAGE_HTML = `
   <div class="wrap">
     <div class="trustbar">
       <div class="trust-avatars">
-        <span class="avatar avatar-1">EC</span>
-        <span class="avatar avatar-2">SR</span>
-        <span class="avatar avatar-3">NM</span>
-        <span class="avatar avatar-4">HB</span>
-        <span class="avatar avatar-5">YT</span>
+        <span class="avatar avatar-1"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg></span>
+        <span class="avatar avatar-2"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg></span>
+        <span class="avatar avatar-3"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg></span>
+        <span class="avatar avatar-4"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg></span>
+        <span class="avatar avatar-5"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg></span>
         <span class="avatar avatar-more">+20</span>
       </div>
       <div class="trust-count"><span class="hl-soft">+20 entreprises</span> d'aménagement et de rénovation nous font confiance au Maroc</div>
@@ -606,17 +607,17 @@ const PAGE_HTML = `
       <div class="quote-card" data-reveal>
         <span class="stars">★★★★★</span>
         <p>« Depuis qu'on travaille avec ReachFlow, on <span class="hl">ne dépend plus uniquement du bouche-à-oreille</span>. On a enfin une <span class="hl">vraie stratégie de croissance</span>, pas juste des contacts au compte-gouttes. »</p>
-        <div class="quote-who"><div class="avatar avatar-3" style="width:32px;height:32px;font-size:0.7rem;">NM</div><div><span>Entreprise d'aménagement intérieur, Marrakech</span></div></div>
+        <div class="quote-who"><div class="avatar avatar-3" style="width:32px;height:32px;"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg></div><div><span>Entreprise d'aménagement intérieur, Marrakech</span></div></div>
       </div>
       <div class="quote-card" data-reveal>
         <span class="stars">★★★★★</span>
         <p>« L'équipe est réactive et <span class="hl">comprend vraiment les contraintes du secteur</span>. Ce n'est pas juste des demandes, c'est un <span class="hl">vrai accompagnement</span>. »</p>
-        <div class="quote-who"><div class="avatar avatar-4" style="width:32px;height:32px;font-size:0.7rem;">HB</div><div><span>Société d'aménagement, Casablanca</span></div></div>
+        <div class="quote-who"><div class="avatar avatar-4" style="width:32px;height:32px;"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg></div><div><span>Société d'aménagement, Casablanca</span></div></div>
       </div>
       <div class="quote-card" data-reveal>
         <span class="stars">★★★★★</span>
         <p>« On a enfin une <span class="hl">visibilité claire sur notre pipeline</span> de chantiers au lieu de subir les creux d'activité. »</p>
-        <div class="quote-who"><div class="avatar avatar-5" style="width:32px;height:32px;font-size:0.7rem;">YT</div><div><span>Société de rénovation, Tanger</span></div></div>
+        <div class="quote-who"><div class="avatar avatar-5" style="width:32px;height:32px;"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg></div><div><span>Société de rénovation, Tanger</span></div></div>
       </div>
     </div>
   </div>
