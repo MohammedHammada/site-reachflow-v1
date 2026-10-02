@@ -1023,7 +1023,6 @@ export default function AmenagementSimulateurPage() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ ...buildPayload(), isDisqualified: false }),
         });
-        window.fbq?.("track", "Lead");
       } catch (err) {
         console.error(err);
       }
