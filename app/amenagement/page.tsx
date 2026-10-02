@@ -44,7 +44,7 @@ const PAGE_STYLES = `
   #rf-lp img{max-width:100%; display:block;}
   #rf-lp .wrap{max-width:1100px; margin:0 auto; padding:0 24px; min-width:0; position:relative; z-index:1;}
   #rf-lp .hero-content > *, #rf-lp .approach-grid > *, #rf-lp .form-wrap > *, #rf-lp .how-grid > *,
-  #rf-lp .test-grid > *, #rf-lp .quote-grid > *, #rf-lp .check-grid > *{ min-width:0; }
+  #rf-lp .quote-grid > *, #rf-lp .check-grid > *{ min-width:0; }
   #rf-lp h1,#rf-lp h2,#rf-lp h3{font-weight:700; color:var(--text);}
   #rf-lp h1{font-size:clamp(2.4rem, 5.4vw, 4.4rem); line-height:1.04; letter-spacing:-0.025em;}
   #rf-lp h2{font-size:clamp(1.7rem, 3.4vw, 2.6rem); line-height:1.08; letter-spacing:-0.02em;}
@@ -246,20 +246,12 @@ const PAGE_STYLES = `
   #rf-lp .results-item:hover{ transform:translateY(-4px); box-shadow:0 16px 36px color-mix(in srgb, var(--accent) 20%, transparent); }
   #rf-lp .results-item img{ display:block; width:100%; height:auto; }
 
-  #rf-lp .test-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:20px; margin-bottom:20px;}
-  @media (max-width:720px){ #rf-lp .test-grid{grid-template-columns:1fr;} }
-  #rf-lp .test-audio{ background:var(--bg-elevated); border:1px solid var(--border); border-radius:var(--radius-m); padding:24px; display:flex; flex-direction:column; gap:12px; box-shadow:var(--shadow-s); }
-  #rf-lp .test-audio-top{display:flex; align-items:center; gap:12px;}
   #rf-lp .avatar{width:44px; height:44px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-weight:700; color:#fff; font-size:0.85rem;}
   #rf-lp .avatar-1{ background:linear-gradient(135deg, #FF6B29, #FF3D68); }
   #rf-lp .avatar-2{ background:linear-gradient(135deg, #FFB020, #FF6B29); }
   #rf-lp .avatar-3{ background:linear-gradient(135deg, #FF3D68, #B84E9E); }
   #rf-lp .avatar-4{ background:linear-gradient(135deg, #FF8A3D, #FF3D68); }
   #rf-lp .avatar-5{ background:linear-gradient(135deg, #FFB020, #FF3D68); }
-  #rf-lp .test-audio strong{font-size:0.94rem;}
-  #rf-lp .test-audio .badge{font-size:0.74rem; color:var(--check); display:block; margin-top:2px;}
-  #rf-lp .waveform{height:34px; border-radius:var(--radius-pill); background:var(--surface); position:relative; overflow:hidden;}
-  #rf-lp .waveform::after{ content:""; position:absolute; inset:0; background:repeating-linear-gradient(90deg, var(--accent) 0 3px, transparent 3px 6px); opacity:0.3; }
   #rf-lp .quote-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:20px;}
   @media (max-width:820px){ #rf-lp .quote-grid{grid-template-columns:1fr;} }
   #rf-lp .quote-card{ background:var(--bg-elevated); border:1px solid var(--border); border-radius:var(--radius-m); padding:24px; box-shadow:var(--shadow-s); transition:box-shadow 250ms var(--ease), transform 250ms var(--ease); }
@@ -366,10 +358,10 @@ const PAGE_HTML = `
 
         <div class="hero-roadmap">
           <div class="roadmap-card" data-reveal>
-            <img class="roadmap-img" src="/roadmap-amenagement-preview.png" alt="Aperçu flouté de la roadmap de croissance en 6 étapes">
+            <img class="roadmap-img" src="/roadmap-amenagement-preview.png" alt="Aperçu flouté du plan des 90 premiers jours">
             ${HERO_ROADMAP_SVG}
           </div>
-          <p class="roadmap-caption">La roadmap détaillée vous est dévoilée pendant votre <span class="hl-soft">diagnostic gratuit</span>.</p>
+          <p class="roadmap-caption">Votre plan détaillé des 90 jours vous est dévoilé pendant votre <span class="hl-soft">diagnostic gratuit</span>.</p>
         </div>
       </div>
     </div>
@@ -401,15 +393,6 @@ const PAGE_HTML = `
 
 <section>
   <div class="wrap">
-    <div class="steps-title" data-reveal>
-      <h2><span class="gradient-text">Les 6 étapes</span> pour garder votre carnet plein, identifiées dans toutes les entreprises d'aménagement que nous avons accompagnées.</h2>
-      <p>Et les raisons précises pour lesquelles votre entreprise est probablement bloquée à l'une de ces étapes — <span class="hl">dépendance au réseau</span>, <span class="hl">devis qui traînent</span>, ou <span class="hl">chantiers qui plafonnent</span> votre capacité.</p>
-    </div>
-  </div>
-</section>
-
-<section>
-  <div class="wrap">
     <div class="section-head center" data-reveal>
       <span class="eyebrow-num">Comment ça marche</span>
       <h2>De votre premier appel à un <span class="gradient-text">carnet rempli pour 3 mois</span>.</h2>
@@ -435,10 +418,10 @@ const PAGE_HTML = `
       </div>
     </div>
     <div class="cta-center">
-      <a href="#form" class="btn">Découvrez si votre entreprise est éligible</a>
+      <a href="#form" class="btn">Voir si mon entreprise est éligible à la garantie</a>
       <div class="micro-risk">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>
-        <span><span class="hl-soft">Diagnostic de 30 min, offert.</span> Si on ne voit pas comment vous apporter plus de chantiers, on vous le dit franchement — et on s'arrête là.</span>
+        <span>Diagnostic de 30 min offert · 5 places ouvertes</span>
       </div>
     </div>
   </div>
