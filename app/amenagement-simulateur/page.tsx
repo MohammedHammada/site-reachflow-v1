@@ -493,7 +493,7 @@ const PAGE_HTML = `
     <div class="form-card sim-card" data-reveal>
       <div class="form-progress">
         <div class="form-progress-bar"><div class="form-progress-fill" id="formProgressFill"></div></div>
-        <span class="form-progress-label" id="formProgressLabel">Étape 1 sur 8</span>
+        <span class="form-progress-label" id="formProgressLabel">Étape 1 sur 7</span>
       </div>
       <form id="simForm">
 
@@ -571,22 +571,25 @@ const PAGE_HTML = `
             <label for="simEntreprise">Nom de l'entreprise *</label>
             <input type="text" id="simEntreprise" required>
           </div>
+          <div class="field">
+            <label>Quel budget publicitaire mensuel pouvez-vous investir pour attirer de nouveaux clients ? *</label>
+            <div class="check-grid">
+              <button type="button" class="sim-option-btn" data-field="budget_pub" data-value="moins-3k">Moins de 3 000 MAD</button>
+              <button type="button" class="sim-option-btn" data-field="budget_pub" data-value="3k-6k">3 000 – 6 000 MAD</button>
+              <button type="button" class="sim-option-btn" data-field="budget_pub" data-value="6k-10k">6 000 – 10 000 MAD</button>
+              <button type="button" class="sim-option-btn" data-field="budget_pub" data-value="plus-10k">Plus de 10 000 MAD</button>
+            </div>
+          </div>
+          <div class="field">
+            <label>Êtes-vous la personne qui prend la décision ? *</label>
+            <div class="check-grid">
+              <button type="button" class="sim-option-btn" data-field="decideur" data-value="oui">Oui</button>
+              <button type="button" class="sim-option-btn" data-field="decideur" data-value="avec-associe">Avec un associé</button>
+              <button type="button" class="sim-option-btn" data-field="decideur" data-value="non">Non</button>
+            </div>
+          </div>
           <button type="button" class="btn-back step-back">&larr; Retour</button>
-          <button type="button" class="btn btn-block" id="simStep7Submit">Continuer</button>
-        </div>
-
-        <div class="form-step" data-step="8">
-          <div class="sim-question"><h3>Quel budget publicitaire mensuel pouvez-vous investir pour attirer de nouveaux clients ?</h3></div>
-          <button type="button" class="sim-option-btn" data-field="budget_pub" data-value="moins-3k">Moins de 3 000 MAD</button>
-          <button type="button" class="sim-option-btn" data-field="budget_pub" data-value="3k-6k">3 000 – 6 000 MAD</button>
-          <button type="button" class="sim-option-btn" data-field="budget_pub" data-value="6k-10k">6 000 – 10 000 MAD</button>
-          <button type="button" class="sim-option-btn" data-field="budget_pub" data-value="plus-10k">Plus de 10 000 MAD</button>
-          <div class="sim-question" style="margin-top:28px;"><h3>Êtes-vous la personne qui prend la décision ?</h3></div>
-          <button type="button" class="sim-option-btn" data-field="decideur" data-value="oui">Oui</button>
-          <button type="button" class="sim-option-btn" data-field="decideur" data-value="avec-associe">Avec un associé</button>
-          <button type="button" class="sim-option-btn" data-field="decideur" data-value="non">Non</button>
-          <button type="button" class="btn-back step-back">&larr; Retour</button>
-          <button type="button" class="btn btn-block" id="simStep8Submit">Voir si je suis éligible</button>
+          <button type="button" class="btn btn-block" id="simStep7Submit">Voir si mon entreprise est éligible</button>
         </div>
 
       </form>
@@ -989,8 +992,25 @@ export default function AmenagementSimulateurPage() {
       ...extra,
     });
 
+    // ---- Qualification buttons (budget_pub, decideur) — live inside step 7 now ----
+    const qualifFields = ["budget_pub", "decideur"];
+    const qualifButtons: { btn: HTMLButtonElement; handler: () => void }[] = [];
+    qualifFields.forEach((field) => {
+      const buttons = Array.from(root.querySelectorAll<HTMLButtonElement>(`[data-field="${field}"]`));
+      buttons.forEach((btn) => {
+        const handler = () => {
+          buttons.forEach((b) => b.classList.toggle("is-selected", b === btn));
+          const value = btn.dataset.value || "";
+          if (field === "budget_pub") data.budget_pub = value;
+          if (field === "decideur") data.decideur = value;
+        };
+        btn.addEventListener("click", handler);
+        qualifButtons.push({ btn, handler });
+      });
+    });
+
     const step7SubmitBtn = root.querySelector<HTMLButtonElement>("#simStep7Submit");
-    const onStep7Submit = async () => {
+    const onStep7Submit = () => {
       const nomEl = root.querySelector<HTMLInputElement>("#simNom");
       const villeEl = root.querySelector<HTMLInputElement>("#simVille");
       const entrepriseEl = root.querySelector<HTMLInputElement>("#simEntreprise");
@@ -1008,64 +1028,27 @@ export default function AmenagementSimulateurPage() {
       }
       if (!ville) { alert("Merci d'indiquer votre ville."); villeEl?.focus(); return; }
       if (!entreprise) { alert("Merci d'indiquer le nom de votre entreprise."); entrepriseEl?.focus(); return; }
+      if (!data.budget_pub) { alert("Merci d'indiquer le budget envisagé."); return; }
+      if (!data.decideur) { alert("Merci d'indiquer si vous êtes décisionnaire."); return; }
 
       data.nom = nom;
       data.whatsapp = phone;
       data.ville = ville;
       data.entreprise = entreprise;
-
-      if (step7SubmitBtn) { step7SubmitBtn.disabled = true; step7SubmitBtn.textContent = "Envoi…"; }
-      try {
-        await fetch("/api/submit-lead", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ...buildPayload(), isDisqualified: false }),
-        });
-      } catch (err) {
-        console.error(err);
-      }
-      if (step7SubmitBtn) { step7SubmitBtn.disabled = false; step7SubmitBtn.textContent = "Continuer"; }
-      goToSimStep(8);
-    };
-    step7SubmitBtn?.addEventListener("click", onStep7Submit);
-
-    // ---- Qualification (step 8) ----
-    const qualifFields = ["budget_pub", "decideur"];
-    const qualifButtons: { btn: HTMLButtonElement; handler: () => void }[] = [];
-    qualifFields.forEach((field) => {
-      const buttons = Array.from(root.querySelectorAll<HTMLButtonElement>(`[data-field="${field}"]`));
-      buttons.forEach((btn) => {
-        const handler = () => {
-          buttons.forEach((b) => b.classList.toggle("is-selected", b === btn));
-          const value = btn.dataset.value || "";
-          if (field === "budget_pub") data.budget_pub = value;
-          if (field === "decideur") data.decideur = value;
-        };
-        btn.addEventListener("click", handler);
-        qualifButtons.push({ btn, handler });
-      });
-    });
-
-    const step8SubmitBtn = root.querySelector<HTMLButtonElement>("#simStep8Submit");
-    const onStep8Submit = async () => {
-      if (!data.budget_pub) { alert("Merci d'indiquer le budget envisagé."); return; }
-      if (!data.decideur) { alert("Merci d'indiquer si vous êtes décisionnaire."); return; }
-
       // No disqualification: everyone who completes the form moves on.
       data.qualifie = true;
 
-      if (step8SubmitBtn) { step8SubmitBtn.disabled = true; step8SubmitBtn.textContent = "Envoi…"; }
-      try {
-        await fetch("/api/submit-lead", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ...buildPayload({ note: "Mise à jour qualification" }), isDisqualified: false }),
-        });
-        // GTM listens for this and fires the Meta "QualifiedLead" custom event.
-        pushDataLayer({ event: "qualified_lead", metier: data.metier, budget_pub: data.budget_pub, decideur: data.decideur });
-      } catch (err) {
-        console.error(err);
-      }
+      // Fire-and-forget: Google Apps Script responses are slow (2-5s), so we
+      // don't make the visitor wait on it — redirect right away instead.
+      fetch("/api/submit-lead", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...buildPayload(), isDisqualified: false }),
+      }).catch((err) => console.error(err));
+
+      // GTM listens for this and fires the Meta "QualifiedLead" custom event.
+      pushDataLayer({ event: "qualified_lead", metier: data.metier, budget_pub: data.budget_pub, decideur: data.decideur });
+
       const params = new URLSearchParams({
         nom: data.nom,
         phone: data.whatsapp,
@@ -1074,7 +1057,7 @@ export default function AmenagementSimulateurPage() {
       });
       router.push(`/thank-you-amenagement?${params.toString()}`);
     };
-    step8SubmitBtn?.addEventListener("click", onStep8Submit);
+    step7SubmitBtn?.addEventListener("click", onStep7Submit);
 
     return () => {
       window.removeEventListener("scroll", onScroll);
@@ -1089,7 +1072,6 @@ export default function AmenagementSimulateurPage() {
       simPhoneEl?.removeEventListener("input", onSimPhoneInput);
       step7SubmitBtn?.removeEventListener("click", onStep7Submit);
       qualifButtons.forEach(({ btn, handler }) => btn.removeEventListener("click", handler));
-      step8SubmitBtn?.removeEventListener("click", onStep8Submit);
     };
   }, [router]);
 
