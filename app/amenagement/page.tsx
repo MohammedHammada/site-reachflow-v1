@@ -593,7 +593,7 @@ const PAGE_HTML = `
 <section>
   <div class="wrap">
     <div class="proof-banner" data-reveal>
-      <div class="proof-number">+120 millions de dirhams</div>
+      <div class="proof-number">+85 millions de dirhams</div>
       <p>de projets accompagnés pour nos partenaires en <span class="hl-light">moins de 2 ans</span>.</p>
     </div>
 
