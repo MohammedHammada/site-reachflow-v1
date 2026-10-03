@@ -236,8 +236,10 @@ function ThankYouContent() {
   const typesFromLp = params.get("types")?.trim() || "";
 
   useEffect(() => {
-    const w = window as typeof window & { fbq?: (...args: unknown[]) => void };
-    w.fbq?.("track", "Lead");
+    // GTM listens for this and fires the Meta standard "Lead" event.
+    const w = window as typeof window & { dataLayer?: unknown[] };
+    w.dataLayer = w.dataLayer || [];
+    w.dataLayer.push({ event: "lead_conversion" });
   }, []);
 
   useEffect(() => {

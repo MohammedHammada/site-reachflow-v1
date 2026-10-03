@@ -929,6 +929,8 @@ export default function AmenagementSimulateurPage() {
         leakBox.innerHTML = `<strong>Votre principale fuite : ${leak.title}</strong><p>${leak.text}</p>`;
       }
 
+      // GTM listens for this "simulator_result" dataLayer event and fires
+      // the Meta "SimulatorResult" custom event from there.
       pushDataLayer({
         event: "simulator_result",
         metier: data.metier,
@@ -936,10 +938,6 @@ export default function AmenagementSimulateurPage() {
         signes_sur_10: data.signes_sur_10,
         montant_moyen_value: data.montant_moyen_value,
         delai_reponse: data.delai_reponse,
-        mad_perdus_mois: madPerdusMois,
-      });
-      window.fbq?.("trackCustom", "SimulatorResult", {
-        metier: data.metier,
         mad_perdus_mois: madPerdusMois,
         mad_perdus_an: madPerdusAn,
       });
@@ -1063,7 +1061,8 @@ export default function AmenagementSimulateurPage() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ ...buildPayload({ note: "Mise à jour qualification" }), isDisqualified: false }),
         });
-        window.fbq?.("trackCustom", "QualifiedLead");
+        // GTM listens for this and fires the Meta "QualifiedLead" custom event.
+        pushDataLayer({ event: "qualified_lead", metier: data.metier, budget_pub: data.budget_pub, decideur: data.decideur });
       } catch (err) {
         console.error(err);
       }
