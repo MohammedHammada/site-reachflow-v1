@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { waitUntil } from "@vercel/functions";
-import { syncLeadToGhl } from "@/lib/ghl";
+import { syncLeadToGhl, syncSimulatorLeadToGhl } from "@/lib/ghl";
 
 export const runtime = "nodejs";
 
@@ -54,7 +54,20 @@ export async function POST(req: NextRequest) {
   // the page navigating to the thank-you page right after; running it here
   // with waitUntil keeps it alive past the response without making the
   // visitor wait for it.
-  if (source.startsWith("amenagement")) {
+  // /amenagement-simulateur has its own field mapping and tags (see
+  // syncSimulatorLeadToGhl) — kept fully separate from syncLeadToGhl so
+  // /amenagement's working path is never touched by this.
+  if (source === "amenagement-simulateur") {
+    waitUntil(
+      syncSimulatorLeadToGhl(payload as Record<string, unknown>)
+        .then(({ contactId, opportunityId }) => {
+          console.log(`submit-lead -> GHL (simulateur) ok: contact=${contactId} opportunity=${opportunityId}`);
+        })
+        .catch((err) => {
+          console.error("submit-lead -> GHL (simulateur) sync failed:", err instanceof Error ? err.message : err);
+        })
+    );
+  } else if (source.startsWith("amenagement")) {
     waitUntil(
       syncLeadToGhl(payload as Record<string, unknown>)
         .then(({ contactId, opportunityId }) => {

@@ -264,3 +264,109 @@ export async function syncLeadToGhl(body: Record<string, unknown>): Promise<{ co
 
   return { contactId, opportunityId };
 }
+
+// ---- Notes ----
+export async function createNote(contactId: string, body: string) {
+  const res = await ghlFetch(`/contacts/${contactId}/notes`, {
+    method: "POST",
+    body: JSON.stringify({ body }),
+  });
+  if (!res.ok) throw new Error(`contacts/notes failed: ${res.status} ${await res.text()}`);
+  return res.json();
+}
+
+// Finds an existing OPEN opportunity for this contact in the given
+// pipeline, so repeated syncs for the same person never create a second
+// opportunity.
+export async function findOpenOpportunity(contactId: string, pipelineId: string): Promise<string | null> {
+  const res = await ghlFetch(
+    `/opportunities/search?location_id=${locationId()}&contact_id=${contactId}`,
+    { method: "GET" }
+  );
+  if (!res.ok) throw new Error(`opportunities search failed: ${res.status} ${await res.text()}`);
+  const data = await res.json();
+  const opportunities: Array<{ id: string; pipelineId: string; status: string }> = data.opportunities || [];
+  const match = opportunities.find((o) => o.pipelineId === pipelineId && o.status === "open");
+  return match?.id || null;
+}
+
+// ---- Simulator ( /amenagement-simulateur ) lead sync — kept entirely
+// separate from syncLeadToGhl() above so /amenagement's working path is
+// never touched. Different tags, different custom-field mapping (the
+// simulator's calculator fields have no /amenagement equivalent and go
+// into a note instead), and upsert-by-phone de-dupes contact + opportunity
+// across repeated calls for the same person. ----
+export async function syncSimulatorLeadToGhl(body: Record<string, unknown>): Promise<{ contactId: string; opportunityId: string }> {
+  const nom = String(body.nom || "").trim();
+  const whatsapp = String(body.whatsapp || "").trim();
+  const email = body.email ? String(body.email).trim() : undefined;
+  const entreprise = String(body.entreprise || "").trim();
+  const ville = body.ville ? String(body.ville) : undefined;
+  const metier = body.metier ? String(body.metier) : undefined;
+  const montantMoyenLabel = body.montant_moyen_label ? String(body.montant_moyen_label) : undefined;
+  const budgetPub = body.budget_pub ? String(body.budget_pub) : undefined;
+  const decideur = body.decideur ? String(body.decideur) : undefined;
+
+  if (!nom || !whatsapp) {
+    throw new Error(`syncSimulatorLeadToGhl: missing nom/whatsapp (nom="${nom}", whatsapp="${whatsapp}")`);
+  }
+
+  const { firstName, lastName } = splitName(nom);
+  const phone = toE164(whatsapp);
+
+  const tags = ["lead-amenagement", "lp-simulateur"];
+  for (const key of ["utm_source", "utm_medium", "utm_campaign", "fbclid"]) {
+    const v = body[key];
+    if (v) tags.push(`${key}:${v}`);
+  }
+
+  const customFields = await buildCustomFields({
+    Entreprise: entreprise,
+    "Métier": metier,
+    "Valeur chantier": montantMoyenLabel,
+    "Budget pub": budgetPub,
+    "Décideur": decideur,
+    "Source page": "amenagement-simulateur",
+  });
+
+  const { contactId } = await upsertContact({
+    firstName,
+    lastName,
+    phone,
+    email,
+    city: ville,
+    companyName: entreprise || undefined,
+    tags,
+    source: "LP Simulateur",
+    customFields,
+  });
+
+  const { pipelineId, stageId: newStageId } = await getPipelineStageId(PIPELINE_NAME, STAGE_NEW);
+  let opportunityId = await findOpenOpportunity(contactId, pipelineId);
+  if (!opportunityId) {
+    const created = await createOpportunity({
+      pipelineId,
+      pipelineStageId: newStageId,
+      contactId,
+      name: `${entreprise || "Sans entreprise"} — ${nom}`,
+    });
+    opportunityId = created.opportunityId;
+  }
+
+  const datetime = body.datetime ? String(body.datetime) : new Date().toLocaleString("fr-FR", { timeZone: "Africa/Casablanca" });
+  const noteLines = [
+    `Simulateur Chantiers Perdus — ${datetime}`,
+    `Métier : ${metier || "—"} | Devis/mois : ${body.devis_mois ?? "—"} | Signés sur 10 : ${body.signes_sur_10 ?? "—"} | Montant moyen : ${montantMoyenLabel || "—"} | Délai de réponse : ${body.delai_reponse || "—"}`,
+    `Devis perdus/mois : ${body.devis_perdus ?? "—"} | Perdu/mois : ${body.mad_perdus_mois ?? "—"} MAD | Perdu/an : ${body.mad_perdus_an ?? "—"} MAD | Principale fuite : ${body.main_leak || "—"}`,
+    `Budget pub : ${budgetPub || "—"} | Décideur : ${decideur || "—"}`,
+  ];
+  try {
+    await createNote(contactId, noteLines.join("\n"));
+  } catch (err) {
+    // Surfaced by the caller's catch/log — if this is a 401/403, it's a
+    // Private Integration scope issue (needs "contacts.notes" write access).
+    throw new Error(`createNote failed: ${err instanceof Error ? err.message : String(err)}`);
+  }
+
+  return { contactId, opportunityId };
+}
