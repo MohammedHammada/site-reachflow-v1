@@ -890,6 +890,10 @@ export default function AmenagementPage() {
         datetime,
       };
 
+      // /api/submit-lead writes to Google Sheets and, server-side via
+      // waitUntil, syncs to GHL too — no separate client call needed, and
+      // nothing here can get cancelled by the router.push() navigation
+      // right after, since it's awaited.
       try {
         await fetch("/api/submit-lead", {
           method: "POST",
@@ -899,18 +903,6 @@ export default function AmenagementPage() {
       } catch (err) {
         console.error(err);
       }
-      // GoHighLevel is an additional destination — never block the visitor's
-      // redirect on it, but keepalive:true lets the request survive the
-      // router.push() navigation that happens right after (a bare
-      // fire-and-forget fetch can get cancelled mid-flight by the page
-      // transition, especially in mobile in-app browsers like Meta's ad
-      // webview).
-      fetch("/api/ghl-lead", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(sheetPayload),
-        keepalive: true,
-      }).catch((err) => console.error(err));
       try {
         const url = process.env.NEXT_PUBLIC_CRM_WEBHOOK_URL;
         const secret = process.env.NEXT_PUBLIC_CRM_WEBHOOK_SECRET;

@@ -200,3 +200,67 @@ export async function updateOpportunityStage(opportunityId: string, pipelineId: 
   if (!res.ok) throw new Error(`opportunities update failed: ${res.status} ${await res.text()}`);
   return res.json();
 }
+
+// ---- Full lead sync, shared by /api/submit-lead (server-side, via
+// waitUntil) and /api/ghl-lead (kept as a thin manual-test endpoint). ----
+const PIPELINE_NAME = "Acquisition Aménagement";
+const STAGE_NEW = "Nouveau lead";
+
+export async function syncLeadToGhl(body: Record<string, unknown>): Promise<{ contactId: string; opportunityId: string }> {
+  const nomComplet = String(body.nomComplet || "").trim();
+  const telephone = String(body.telephone || "").trim();
+  const email = body.email ? String(body.email).trim() : undefined;
+  const entreprise = String(body.entreprise || "").trim();
+  const ville = body.ville ? String(body.ville) : undefined;
+  const typesDeProjets = body.typesDeProjets ? String(body.typesDeProjets) : undefined;
+  const valeurChantier = body.valeur_chantier ? String(body.valeur_chantier) : undefined;
+  const capaciteChantiers = body.capacite_chantiers ? String(body.capacite_chantiers) : undefined;
+  const budgetPub = body.budget_investissement ? String(body.budget_investissement) : undefined;
+  const decideur = body.decideur ? String(body.decideur) : undefined;
+  const sourcePage = body.source ? String(body.source) : "amenagement";
+
+  if (!nomComplet || !telephone) {
+    throw new Error(`syncLeadToGhl: missing name/phone (nomComplet="${nomComplet}", telephone="${telephone}")`);
+  }
+
+  const { firstName, lastName } = splitName(nomComplet);
+  const phone = toE164(telephone);
+
+  const tags = ["lead-amenagement", "lp-amenagement"];
+  for (const key of ["utm_source", "utm_medium", "utm_campaign", "fbclid"]) {
+    const v = body[key];
+    if (v) tags.push(`${key}:${v}`);
+  }
+
+  const customFields = await buildCustomFields({
+    Entreprise: entreprise,
+    "Métier": typesDeProjets,
+    "Valeur chantier": valeurChantier,
+    "Capacité chantiers": capaciteChantiers,
+    "Budget pub": budgetPub,
+    "Décideur": decideur,
+    "Source page": sourcePage,
+  });
+
+  const { contactId } = await upsertContact({
+    firstName,
+    lastName,
+    phone,
+    email,
+    city: ville,
+    companyName: entreprise || undefined,
+    tags,
+    source: "LP Aménagement",
+    customFields,
+  });
+
+  const { pipelineId, stageId: newStageId } = await getPipelineStageId(PIPELINE_NAME, STAGE_NEW);
+  const { opportunityId } = await createOpportunity({
+    pipelineId,
+    pipelineStageId: newStageId,
+    contactId,
+    name: `${entreprise || "Sans entreprise"} — ${nomComplet}`,
+  });
+
+  return { contactId, opportunityId };
+}
