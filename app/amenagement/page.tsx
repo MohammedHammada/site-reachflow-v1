@@ -887,6 +887,13 @@ export default function AmenagementPage() {
       } catch (err) {
         console.error(err);
       }
+      // Fire-and-forget: GoHighLevel is an additional destination, never
+      // block the visitor's redirect on it.
+      fetch("/api/ghl-lead", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(sheetPayload),
+      }).catch((err) => console.error(err));
       try {
         const url = process.env.NEXT_PUBLIC_CRM_WEBHOOK_URL;
         const secret = process.env.NEXT_PUBLIC_CRM_WEBHOOK_SECRET;
