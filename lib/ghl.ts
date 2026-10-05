@@ -117,6 +117,7 @@ export async function upsertContact(payload: {
   firstName: string;
   lastName: string;
   phone: string;
+  email?: string;
   city?: string;
   companyName?: string;
   tags: string[];
@@ -130,6 +131,7 @@ export async function upsertContact(payload: {
       firstName: payload.firstName,
       lastName: payload.lastName,
       phone: payload.phone,
+      email: payload.email,
       city: payload.city,
       companyName: payload.companyName,
       tags: payload.tags,

@@ -26,6 +26,7 @@ export async function POST(req: NextRequest) {
   try {
     const nomComplet = String(body.nomComplet || "").trim();
     const telephone = String(body.telephone || "").trim();
+    const email = body.email ? String(body.email).trim() : undefined;
     const entreprise = String(body.entreprise || "").trim();
     const ville = body.ville ? String(body.ville) : undefined;
     const typesDeProjets = body.typesDeProjets ? String(body.typesDeProjets) : undefined;
@@ -62,6 +63,7 @@ export async function POST(req: NextRequest) {
       firstName,
       lastName,
       phone,
+      email,
       city: ville,
       companyName: entreprise || undefined,
       tags,
