@@ -580,6 +580,10 @@ const PAGE_HTML = `
               <label for="email">Email *</label>
               <input type="email" id="email" required>
             </div>
+            <div class="field">
+              <label for="ville">Ville *</label>
+              <input type="text" id="ville" required>
+            </div>
             <button type="button" class="btn-back step-back">&larr; Retour</button>
             <button type="submit" class="btn btn-block" id="leadSubmitBtn">Voir si mon entreprise est éligible</button>
             <p class="form-note"><span class="hl-soft">Diagnostic de 30 min, offert.</span> Si on ne voit pas comment vous apporter plus de chantiers, on vous le dit franchement — et on s'arrête là.</p>
@@ -850,10 +854,17 @@ export default function AmenagementPage() {
       const fullname = (form.querySelector<HTMLInputElement>("#fullname")?.value || "").trim();
       const phone = (form.querySelector<HTMLInputElement>("#phone")?.value || "").trim();
       const email = (form.querySelector<HTMLInputElement>("#email")?.value || "").trim();
+      const villeEl = form.querySelector<HTMLInputElement>("#ville");
+      const ville = (villeEl?.value || "").trim();
       const phoneDigits = phone.replace(/\D/g, "");
       if (phoneDigits.length < 9 || phoneDigits.length > 14 || !/^[\d\s()+-]+$/.test(phone)) {
         alert("Merci d'entrer un numéro de téléphone valide (chiffres uniquement).");
         form.querySelector<HTMLInputElement>("#phone")?.focus();
+        return;
+      }
+      if (!ville) {
+        alert("Merci d'indiquer votre ville.");
+        villeEl?.focus();
         return;
       }
       if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = "Envoi…"; }
@@ -869,6 +880,7 @@ export default function AmenagementPage() {
         nomComplet: fullname,
         telephone: phone,
         email,
+        ville,
         entreprise: company,
         typesDeProjets: projectTypes.join(", "),
         valeur_chantier: valeurChantier,
