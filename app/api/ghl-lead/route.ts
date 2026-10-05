@@ -1,27 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
-  addContactTag,
   buildCustomFields,
   createOpportunity,
   getPipelineStageId,
   splitName,
   toE164,
-  updateContact,
   upsertContact,
-  updateOpportunityStage,
 } from "@/lib/ghl";
 
 export const runtime = "nodejs";
 
 const PIPELINE_NAME = "Acquisition Aménagement";
 const STAGE_NEW = "Nouveau lead";
-const STAGE_QUALIFIED = "Qualifié";
 
-// /amenagement submits once (no separate "step 1 / step 2" like the
-// simulator funnel), and the page has no disqualification path — so this
-// route does the full upsert-contact + create-opportunity + mark-qualified
-// flow in one shot, instead of the two-phase version described for a form
-// that actually splits contact capture from qualification answers.
+// Every lead lands in "Nouveau lead" — no server-side qualification logic.
+// Qualification happens by phone, manually, inside GHL from here on.
 export async function POST(req: NextRequest) {
   let body: Record<string, unknown>;
   try {
@@ -62,7 +55,6 @@ export async function POST(req: NextRequest) {
       "Capacité chantiers": capaciteChantiers,
       "Budget pub": budgetPub,
       "Décideur": decideur,
-      "Qualifié": "oui",
       "Source page": sourcePage,
     });
 
@@ -84,15 +76,6 @@ export async function POST(req: NextRequest) {
       contactId,
       name: `${entreprise || "Sans entreprise"} — ${nomComplet}`,
     });
-
-    // No disqualification path on /amenagement: every completed submission
-    // is treated as qualified immediately.
-    await updateContact(contactId, {
-      customFields: await buildCustomFields({ "Qualifié": "oui" }),
-    });
-    await addContactTag(contactId, "qualifie");
-    const { stageId: qualifiedStageId } = await getPipelineStageId(PIPELINE_NAME, STAGE_QUALIFIED);
-    await updateOpportunityStage(opportunityId, pipelineId, qualifiedStageId);
 
     return NextResponse.json({ ok: true, contactId, opportunityId });
   } catch (err) {
