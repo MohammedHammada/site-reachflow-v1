@@ -1038,12 +1038,16 @@ export default function AmenagementSimulateurPage() {
       // No disqualification: everyone who completes the form moves on.
       data.qualifie = true;
 
-      // Fire-and-forget: Google Apps Script responses are slow (2-5s), so we
-      // don't make the visitor wait on it — redirect right away instead.
+      // Google Apps Script responses are slow (2-5s), so we don't make the
+      // visitor wait on it — redirect right away. keepalive:true lets the
+      // request survive that immediate navigation instead of risking
+      // cancellation mid-flight (seen as a real issue on /amenagement's
+      // equivalent GHL call).
       fetch("/api/submit-lead", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...buildPayload(), isDisqualified: false }),
+        keepalive: true,
       }).catch((err) => console.error(err));
 
       // GTM listens for this and fires the Meta "QualifiedLead" custom event.

@@ -899,12 +899,17 @@ export default function AmenagementPage() {
       } catch (err) {
         console.error(err);
       }
-      // Fire-and-forget: GoHighLevel is an additional destination, never
-      // block the visitor's redirect on it.
+      // GoHighLevel is an additional destination — never block the visitor's
+      // redirect on it, but keepalive:true lets the request survive the
+      // router.push() navigation that happens right after (a bare
+      // fire-and-forget fetch can get cancelled mid-flight by the page
+      // transition, especially in mobile in-app browsers like Meta's ad
+      // webview).
       fetch("/api/ghl-lead", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(sheetPayload),
+        keepalive: true,
       }).catch((err) => console.error(err));
       try {
         const url = process.env.NEXT_PUBLIC_CRM_WEBHOOK_URL;

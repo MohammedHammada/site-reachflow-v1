@@ -15,8 +15,8 @@ function doPost(e) {
 
     if (sheet.getLastRow() === 0) {
       sheet.appendRow([
-        'Date', 'Nom complet', 'Téléphone', 'Email', 'Ville', 'Entreprise',
-        'Types de projets', 'Valeur chantier', 'Capacité chantiers', 'Budget investissement', 'Source', 'Note'
+        'Date', 'Nom complet', 'Téléphone', 'Email', 'Entreprise',
+        'Types de projets', 'Valeur chantier', 'Capacité chantiers', 'Budget investissement', 'Source', 'Note', 'Ville'
       ]);
     }
 
@@ -25,14 +25,14 @@ function doPost(e) {
       data.nomComplet || '',
       data.telephone || '',
       data.email || '',
-      data.ville || '',
       data.entreprise || '',
       data.typesDeProjets || '',
       data.valeur_chantier || '',
       data.capacite_chantiers || '',
       data.budget_investissement || '',
       data.source || 'amenagement',
-      data.note || ''
+      data.note || '',
+      data.ville || ''
     ]);
 
     return ContentService
