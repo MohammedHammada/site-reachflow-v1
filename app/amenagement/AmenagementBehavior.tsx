@@ -2,12 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-
-declare global {
-  interface Window {
-    fbq?: (...args: unknown[]) => void;
-  }
-}
+import { writeThankYouHandoff } from "@/lib/thankYouHandoff";
 
 // All interactive behavior for the (server-rendered, static) /amenagement
 // markup, split out so its JS chunk loads off the critical path (see
@@ -269,22 +264,21 @@ export default function AmenagementBehavior() {
         console.error(err);
       }
 
-      try {
-        if (typeof window.fbq === "function") {
-          window.fbq("track", "Lead");
-        }
-      } catch (err) {
-        console.error(err);
-      }
-
-      const params = new URLSearchParams({
+      // Lead now fires once on the thank-you page itself (guarded by the
+      // pending flag below), not here — this used to call fbq('track',
+      // 'Lead') directly, but that duplicated the signal once GTM's own
+      // lead_conversion-triggered tag was also live, and still left
+      // personal data (nom/phone/email/entreprise) sitting in the
+      // thank-you page's URL, which the Meta Pixel sends to Meta as part
+      // of every pageview. Handoff is now via sessionStorage instead.
+      writeThankYouHandoff({
         nom: fullname,
         phone,
         email,
         entreprise: company,
         types: projectTypes.join(", "),
       });
-      router.push(`/thank-you-amenagement?${params.toString()}`);
+      router.push("/thank-you-amenagement");
     };
     form?.addEventListener("submit", onSubmit);
 

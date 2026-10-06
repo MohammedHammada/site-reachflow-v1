@@ -3,11 +3,14 @@
 import { usePathname } from "next/navigation";
 import Script from "next/script";
 
-// GTM is excluded on /amenagement only: every GTM tag now has its own
-// exception trigger, and the Meta Pixel on that page is hard-coded inline
-// in the root layout, so GTM does nothing there except cost performance.
-// Every other route (including /amenagement-simulateur) keeps loading GTM
-// exactly as before.
+// GTM is excluded on /amenagement and /thank-you-amenagement: every GTM
+// tag these two pages needed now has its own exception trigger, and the
+// Meta Pixel on both is hard-coded inline in the root layout (PageView +,
+// on the thank-you page, a guarded single Lead fire — see
+// lib/thankYouHandoff.ts), so GTM does nothing there except cost
+// performance. Every other route (including /amenagement-simulateur,
+// which still relies on GTM for its own "simulator_result"/"qualified_lead"
+// dataLayer events) keeps loading GTM exactly as before.
 //
 // This check runs client-side (usePathname) rather than via a
 // request-time check (middleware + headers()) deliberately: a dynamic
@@ -20,7 +23,7 @@ import Script from "next/script";
 // of visitors with JavaScript fully disabled, on any route — not just
 // /amenagement. This is the same situation this page's traffic profile
 // (Meta/Instagram in-app browser) doesn't experience anyway.
-const EXCLUDED_PATHS = ["/amenagement"];
+const EXCLUDED_PATHS = ["/amenagement", "/thank-you-amenagement"];
 
 export default function GtmGate() {
   const pathname = usePathname();

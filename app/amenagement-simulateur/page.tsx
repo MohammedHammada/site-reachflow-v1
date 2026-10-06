@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { writeThankYouHandoff } from "@/lib/thankYouHandoff";
 
 // A/B variant of /amenagement: replaces the qualifying form with a
 // "chantiers perdus" calculator/simulator funnel. The original /amenagement
@@ -1053,13 +1054,20 @@ export default function AmenagementSimulateurPage() {
       // GTM listens for this and fires the Meta "QualifiedLead" custom event.
       pushDataLayer({ event: "qualified_lead", metier: data.metier, budget_pub: data.budget_pub, decideur: data.decideur });
 
-      const params = new URLSearchParams({
+      // Handoff to the thank-you page via sessionStorage, not the URL —
+      // see /amenagement's AmenagementBehavior.tsx for why (Meta Pixel
+      // sends the page URL to Meta; it must never carry personal data).
+      // This also sets the same "pending" flag the thank-you page checks
+      // to fire its single Lead event, so simulator-sourced leads keep
+      // getting counted there exactly as /amenagement leads do.
+      writeThankYouHandoff({
         nom: data.nom,
         phone: data.whatsapp,
+        email: "",
         entreprise: data.entreprise,
         types: data.metier,
       });
-      router.push(`/thank-you-amenagement?${params.toString()}`);
+      router.push("/thank-you-amenagement");
     };
     step7SubmitBtn?.addEventListener("click", onStep7Submit);
 

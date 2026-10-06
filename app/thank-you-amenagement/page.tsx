@@ -1,7 +1,13 @@
 "use client";
 
-import { Suspense, useEffect, useRef } from "react";
-import { useSearchParams } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import { readThankYouHandoff, consumeThankYouPendingFlag, type ThankYouLeadData } from "@/lib/thankYouHandoff";
+
+declare global {
+  interface Window {
+    fbq?: (...args: unknown[]) => void;
+  }
+}
 
 // Faithful port of the approved thank-you-amenagement-renovation design,
 // wired to the real backend instead of a fabricated n8n lead_id lookup:
@@ -228,18 +234,48 @@ const PAGE_HTML = `
 
 function ThankYouContent() {
   const rootRef = useRef<HTMLDivElement>(null);
-  const params = useSearchParams();
-  const nom = params.get("nom")?.trim();
-  const phoneFromLp = params.get("phone")?.trim() || "";
-  const emailFromLp = params.get("email")?.trim() || "";
-  const entrepriseFromLp = params.get("entreprise")?.trim() || "";
-  const typesFromLp = params.get("types")?.trim() || "";
+  const [leadData, setLeadData] = useState<ThankYouLeadData | null>(null);
+  const nom = leadData?.nom?.trim();
+  const phoneFromLp = leadData?.phone?.trim() || "";
+  const emailFromLp = leadData?.email?.trim() || "";
+  const entrepriseFromLp = leadData?.entreprise?.trim() || "";
+  const typesFromLp = leadData?.types?.trim() || "";
 
   useEffect(() => {
-    // GTM listens for this and fires the Meta standard "Lead" event.
-    const w = window as typeof window & { dataLayer?: unknown[] };
-    w.dataLayer = w.dataLayer || [];
-    w.dataLayer.push({ event: "lead_conversion" });
+    // Handoff written by /amenagement and /amenagement-simulateur right
+    // before they redirect here (see lib/thankYouHandoff.ts) — personal
+    // data no longer travels in this page's URL, since the Meta Pixel
+    // sends the full page URL to Meta on every pageview.
+    setLeadData(readThankYouHandoff());
+
+    // GTM is not loaded on this page (see components/GtmGate.tsx). The
+    // Meta Pixel is hard-coded inline in the root layout <head>, but that
+    // script only runs once per real document load — getting here via
+    // router.push (a client-side transition, no document reload) would
+    // otherwise never register a PageView for this specific page. Per
+    // Meta's own guidance for SPA route changes, fire it again here,
+    // unconditionally (every real visit to this page is a pageview,
+    // whether arriving from the form or via refresh/direct link).
+    try {
+      if (typeof window.fbq === "function") {
+        window.fbq("track", "PageView");
+      }
+    } catch (err) {
+      console.error(err);
+    }
+
+    // Lead fires here, exactly once, only when the pending flag from a
+    // real form submission is present — a refresh or direct visit to this
+    // URL finds no flag and fires nothing.
+    if (consumeThankYouPendingFlag()) {
+      try {
+        if (typeof window.fbq === "function") {
+          window.fbq("track", "Lead");
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
   }, []);
 
   useEffect(() => {
@@ -332,9 +368,5 @@ function ThankYouContent() {
 }
 
 export default function ThankYouAmenagementPage() {
-  return (
-    <Suspense fallback={null}>
-      <ThankYouContent />
-    </Suspense>
-  );
+  return <ThankYouContent />;
 }
