@@ -80,8 +80,24 @@ export default function RootLayout({
   return (
     <html lang="fr" className={`${spaceGrotesk.variable} ${inter.variable}`}>
       <head>
-        {/* Google Tag Manager - dataLayer */}
-        <Script id="google-tag-manager" strategy="afterInteractive">
+        <link rel="preconnect" href="https://connect.facebook.net" />
+        <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+        {/* Meta Pixel — inline in <head> so PageView fires as early as
+            possible, independent of GTM (which loads lazily below). The
+            matching GTM PageView tag must be paused/removed to avoid
+            double counting — see perf summary. */}
+        <Script id="meta-pixel-inline" strategy="beforeInteractive">
+          {`!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+document,'script','https://connect.facebook.net/en_US/fbevents.js');
+fbq('init','2207138159844806');
+fbq('track','PageView');`}
+        </Script>
+        {/* Google Tag Manager - dataLayer, loaded lazily so it never
+            competes with the main content for the critical path */}
+        <Script id="google-tag-manager" strategy="lazyOnload">
           {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
 j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
@@ -142,6 +158,16 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             height="0"
             width="0"
             style={{ display: "none", visibility: "hidden" }}
+          />
+        </noscript>
+        <noscript>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            height="1"
+            width="1"
+            style={{ display: "none" }}
+            src="https://www.facebook.com/tr?id=2207138159844806&ev=PageView&noscript=1"
+            alt=""
           />
         </noscript>
         {/* Skip navigation for accessibility */}
